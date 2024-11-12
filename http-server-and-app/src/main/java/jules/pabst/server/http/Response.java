@@ -5,17 +5,13 @@ import jules.pabst.server.http.Status;
 import java.util.HashMap;
 
 public class Response {
-    private String httpVersion;
     private Status status;
-    private HashMap<String, String> header;
+    private final HashMap<String, String> header;
     private String body;
 
-    public String getHttpVersion() {
-        return httpVersion;
-    }
 
-    public void setHttpVersion(String httpVersion) {
-        this.httpVersion = httpVersion;
+    public Response() {
+        this.header = new HashMap<>();
     }
 
     public Status getStatus() {
@@ -30,8 +26,8 @@ public class Response {
         return header;
     }
 
-    public void setHeader(HashMap<String, String> header) {
-        this.header = header;
+    public void setHeader(String name, String value) {
+        this.header.put(name, value);
     }
 
     public String getBody() {
