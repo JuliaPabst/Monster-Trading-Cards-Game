@@ -2,44 +2,40 @@ package jules.pabst.server.util;
 
 import jules.pabst.server.http.Response;
 
+import java.util.Map;
+
 public class HttpResponseFormatter {
 
     public String format(Response response) {
-        StringBuilder result = new StringBuilder();
+        StringBuilder responseBuilder = new StringBuilder();
 
-        // Append status line
-        result.append("HTTP/1.1")
-                .append(" ");
+        if (null == response.getStatus()) {
+            throw new NoHttpStatusException("Response does not contain a status");
+        }
 
-        if (response.getStatus() == null || response.getStatus().getMessage() == null) {
-            throw new NoHttpStatusException("Invalid status code or message");
+        responseBuilder
+                .append("HTTP/1.1 ")
+                .append(response.getStatus().getCode()).append(" ")
+                .append(response.getStatus().getMessage())
+                .append("\r\n");
+
+        if (response.getBody() == null || response.getBody().isEmpty()) {
+            response.setHeader("Content-Length", "0");
         } else {
-            result.append(response.getStatus().getCode())
-                    .append(" ")
-                    .append(response.getStatus().getMessage())
-                    .append("\r\n");
+            response.setHeader("Content-Length", "%s".formatted(response.getBody().length()));
         }
 
-
-        // Append headers (if present)
-        if (response.getHeader() != null && !response.getHeader().isEmpty()) {
-            response.getHeader().forEach((key, value) ->
-                    result.append(key).append(": ").append(value).append("\r\n")
-            );
+        for (Map.Entry<String, String> header: response.getHeaders().entrySet()) {
+            responseBuilder.append(header.getKey()).append(": ").append(header.getValue()).append("\r\n");
         }
 
-        if (response.getBody() != null) {
-            result.append("Content-Length").append(": ").append(response.getBody().length()).append("\r\n");
+        if (response.getBody() == null || response.getBody().isEmpty()) {
+            return responseBuilder.toString();
         }
 
-        // extra line break to separate headers from body
-        result.append("\r\n");
+        responseBuilder.append("\r\n");
+        responseBuilder.append(response.getBody());
 
-        // Append body (if present)
-        if (response.getBody() != null) {
-            result.append(response.getBody());
-        }
-
-        return result.toString();
+        return responseBuilder.toString();
     }
 }

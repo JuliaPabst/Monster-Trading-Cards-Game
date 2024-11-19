@@ -8,16 +8,26 @@ public class Request {
 
     private String path;
 
+    private final Map<String, String> header;
+
     private String body;
 
-    private final HashMap<String, String> header;
+    private String http;
+
+    public Method getMethod() {
+        return method;
+    }
 
     public Request() {
         this.header = new HashMap<>();
     }
 
-    public Method getMethod() {
-        return method;
+    public String getHeader(String name) {
+        return this.header.get(name);
+    }
+
+    public void setHeader(String name, String value) {
+        this.header.put(name, value);
     }
 
     public void setMethod(Method method) {
@@ -40,11 +50,11 @@ public class Request {
         this.body = body;
     }
 
-    public String getHeader(String name) {
-        return this.header.get(name);
+    public String getHttp() {
+        return http;
     }
 
-    public void setHeader(String name, String value) {
-        this.header.put(name, value);
+    public void setHttp(String http) {
+        this.http = http;
     }
 }

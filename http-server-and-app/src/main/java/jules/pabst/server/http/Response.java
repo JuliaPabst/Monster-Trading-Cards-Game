@@ -3,15 +3,25 @@ package jules.pabst.server.http;
 import jules.pabst.server.http.Status;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Response {
     private Status status;
-    private final HashMap<String, String> header;
+
+    private final Map<String, String> headers;
+
     private String body;
 
-
     public Response() {
-        this.header = new HashMap<>();
+        this.headers = new HashMap<>();
+    }
+
+    public String getHeader(String name) {
+        return this.headers.get(name);
+    }
+
+    public void setHeader(String name, String value) {
+        this.headers.put(name, value);
     }
 
     public Status getStatus() {
@@ -22,12 +32,8 @@ public class Response {
         this.status = status;
     }
 
-    public HashMap<String, String> getHeader() {
-        return header;
-    }
-
-    public void setHeader(String name, String value) {
-        this.header.put(name, value);
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
     public String getBody() {
