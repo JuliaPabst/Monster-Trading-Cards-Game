@@ -1,37 +1,16 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import jules.pabst.server.http.Method;
+import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
 
-public class GameController {
+public class GameController extends Controller {
 
-    public Response getStats() {
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"stats\": \"{placeholder}\" }"
-        );
-        return response;
-    }
+    @Override
+    public Response handle(Request request) {
 
-    public Response getScoreboard() {
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"scoreboard\": \"{placeholder}\" }"
-        );
-        return response;
-    }
 
-    public Response startBattle() {
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"scoreboard\": \"{placeholder}\" }"
-        );
-        return response;
+        return null;
     }
 }

@@ -1,39 +1,48 @@
 package jules.pabst.application.monsterTradingCards.controller;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.service.CardService;
+import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Status;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 
-public class CardsController {
+import java.util.List;
+
+public class CardsController extends Controller {
     private final CardService cardsService = new CardService();
-    public Response getCards() {
+
+    @Override
+    public Response handle(Request request) {
+        if (request.getMethod().equals(Method.GET)) {
+            return read();
+        }
+
+        return null;
+    }
+
+    public Response read() {
+        List<Card> cards = cardsService.read();
+        StringBuilder builder = new StringBuilder();
+
         Response response = new Response();
         response.setStatus(Status.OK);
         response.setHeader("Content-Type", "application/json");
+
+        for (Card card : cards) {
+            builder.append("\"id\": \"%s\"\n\"name\": \"%s\"\n\"damage\": \"%.2f\"\n".formatted(
+                    card.getId(),
+                    card.getName().getName(),
+                    card.getDamage()
+            ));
+        }
         response.setBody(
-                "{ \"cards\": \"{placeholder}\" }"
+                "{ \n[\n%s]\n }"
+                        .formatted(builder)
         );
         return response;
     }
 
-    public Response getDeck() {
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"deck\": \"{placeholder}\" }"
-        );
-        return response;
-    }
 
-    public Response changeDeck(Request request) {
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"deck\": \"{placeholder}\" }"
-        );
-        return response;
-    }
+
 }

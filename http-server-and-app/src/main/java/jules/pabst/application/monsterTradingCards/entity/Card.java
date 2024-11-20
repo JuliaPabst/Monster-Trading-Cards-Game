@@ -5,4 +5,22 @@ public class Card {
     private CardType name;
     private float damage;
 
+    public Card(String id, CardType name, float damage) {
+        this.id = id;
+        this.name = name;
+        this.damage = damage;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public CardType getName() {
+        return name;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
 }
