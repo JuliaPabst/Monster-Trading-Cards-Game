@@ -1,6 +1,9 @@
 package jules.pabst.application.monsterTradingCards.controller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.entity.Card;
+import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.service.CardService;
+import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Request;
@@ -10,7 +13,11 @@ import jules.pabst.application.monsterTradingCards.entity.Card;
 import java.util.List;
 
 public class CardsController extends Controller {
-    private final CardService cardsService = new CardService();
+    private final CardService cardsService;
+
+    public CardsController() {
+        this.cardsService = new CardService();
+    }
 
     @Override
     public Response handle(Request request) {
@@ -22,25 +29,9 @@ public class CardsController extends Controller {
     }
 
     public Response read() {
-        List<Card> cards = cardsService.read();
-        StringBuilder builder = new StringBuilder();
+        List<Card> cards = cardsService.getAll();
 
-        Response response = new Response();
-        response.setStatus(Status.OK);
-        response.setHeader("Content-Type", "application/json");
-
-        for (Card card : cards) {
-            builder.append("\"id\": \"%s\"\n\"name\": \"%s\"\n\"damage\": \"%.2f\"\n".formatted(
-                    card.getId(),
-                    card.getName().getName(),
-                    card.getDamage()
-            ));
-        }
-        response.setBody(
-                "{ \n[\n%s]\n }"
-                        .formatted(builder)
-        );
-        return response;
+        return json(Status.OK, cards);
     }
 
 

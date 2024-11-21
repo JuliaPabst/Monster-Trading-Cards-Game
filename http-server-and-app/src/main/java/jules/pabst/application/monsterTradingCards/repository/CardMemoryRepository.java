@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CardMemoryRepository implements CardRepository {
-    public List<Card> read() {
-
+    public List<Card> findAll() {
         Card testCard1 = new Card("1", CardType.WaterGoblin, 1);
         Card testCard2 = new Card("2", CardType.WaterElf, 2);
         Card testCard3 = new Card("3", CardType.WaterSpell, 3);

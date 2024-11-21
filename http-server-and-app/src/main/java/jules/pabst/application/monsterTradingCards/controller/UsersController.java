@@ -1,7 +1,11 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.entity.Card;
+import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.service.CardService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
@@ -13,58 +17,41 @@ import java.util.List;
 
 public class UsersController extends Controller {
 
-    private final UserService userService = new UserService();
+    private final UserService userService;
+
+    public UsersController() {
+        this.userService = new UserService();
+    }
 
     @Override
     public Response handle(Request request) {
         if (request.getMethod().equals(Method.POST)) {
             return create(request);
+        } else if (request.getMethod().equals(Method.GET)) {
+            return readUserByName(request);
         }
 
-        return null;
+        return json(Status.OK, null);
     }
 
-    public Response create(Request request) {
-        User user = extractFromBody(request.getBody());
-        user = userService.create(user);
+    private Response create(Request request) {
+        try {
+            User user = fromBody(request.getBody(), User.class);
+            user = userService.create(user);
 
-        Response response = new Response();
-        response.setStatus(Status.CREATED);
-        response.setHeader("Content-Type", "application/json");
-        response.setBody(
-                "{ \"userId\": \"%s\", \n \"username\": \"%s\", \n\"password\": \"%s\" \n}"
-                        .formatted(user.getId(), user.getUsername(), user.getPassword())
-        );
-
-        return response;
-    }
-
-
-    private User extractFromBody(String body) {
-        String username = "";
-        String password = "";
-
-        String[] lines = body.split("\n");
-        for (String line : lines) {
-            if (!line.contains(":")) {
-                continue;
-            }
-
-            String[] keyValue = line.split(":");
-            String key = keyValue[0].trim().replace("\"", "");
-            String value = keyValue[1]
-                    .trim()
-                    .replace("\"", "")
-                    .replace(",", "");
-
-            if (key.equals("Username")) {
-                username = value;
-            }
-            if (key.equals("Password")) {
-                password = value;
-            }
+            return json(Status.CREATED, user);
+        } catch (UserAlreadyExists e) {
+            return json(Status.BAD_REQUEST, new ErrorResponse("User already exists"));
         }
 
-        return new User(username, password);
     }
+
+    private Response readUserByName(Request request) {
+        String[] pathParts = request.getPath().split("/");
+        String name = pathParts[1];
+        User user = userService.getUserByName(name);
+
+        return json(Status.OK, user);
+    }
+
 }

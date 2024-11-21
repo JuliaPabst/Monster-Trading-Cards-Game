@@ -5,9 +5,15 @@ import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DeckController extends Controller {
-    private final CardService cardsService = new CardService();
+    private final CardService cardsService;
+
+
+    public DeckController() {
+        this.cardsService = new CardService();
+    }
 
     @Override
     public Response handle(Request request) {

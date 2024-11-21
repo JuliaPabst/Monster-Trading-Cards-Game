@@ -1,5 +1,6 @@
 package jules.pabst.application.monsterTradingCards;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.controller.*;
 import jules.pabst.application.monsterTradingCards.routing.ControllerNotFound;
 import jules.pabst.application.monsterTradingCards.routing.Router;
@@ -13,9 +14,11 @@ import jules.pabst.server.http.Method;
 public class MonsterTradingCardsApplication implements Application {
 
     private final Router router;
+    private final ObjectMapper objectMapper;
 
     public MonsterTradingCardsApplication() {
         this.router = new Router();
+        this.objectMapper = new ObjectMapper();
 
         this.initializeRoutes();
     }

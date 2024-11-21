@@ -21,4 +21,13 @@ public class UserMemoryRepository implements UserRepository {
         return user;
     }
 
+    @Override
+    public User findUserByName(String username){
+        for(User user : this.users){
+            if(user.getUsername().equals(username)){
+                return user;
+            }
+        }
+        return null;
+    }
 }

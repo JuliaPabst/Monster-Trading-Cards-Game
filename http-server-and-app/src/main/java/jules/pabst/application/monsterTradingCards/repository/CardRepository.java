@@ -7,5 +7,5 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface CardRepository {
-    public List<Card> read();
+    public List<Card> findAll();
 }

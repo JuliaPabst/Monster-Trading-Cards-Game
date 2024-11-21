@@ -40,6 +40,7 @@ public class RequestHandler {
         try (HttpSocket httpSocket = new HttpSocket(this.socket)) {
             String http = httpSocket.read();
             Request request = httpRequestParser.parse(http);
+            System.out.println(request.getPath());
 
             Response response = this.application.handle(request);
 
@@ -52,15 +53,5 @@ public class RequestHandler {
             throw new RuntimeException(e);
         }
 
-        /*
-        this is the idea: do something but close the socket in any case
-        try {
-            // try something risky
-        } catch () {
-            // handle the problem
-        } finally {
-            // cleanup
-        }
-        */
     }
 }

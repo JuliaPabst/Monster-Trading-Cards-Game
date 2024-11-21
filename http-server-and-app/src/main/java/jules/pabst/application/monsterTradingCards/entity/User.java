@@ -15,12 +15,18 @@ public class User {
     private List<Card> deck;
     private List<Card> stack;
 
+    public User() {
+        this.deck = new ArrayList<>();
+        this.stack = new ArrayList<>();
+    }
+
     public User(String username, String password) {
         this.deck = new ArrayList<Card>();
         this.stack = new ArrayList<Card>();
         this.username = username;
         this.password = password;
     }
+
 
     public void setId(String id) {
         this.id = id;
