@@ -1,10 +1,13 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.exception.InvalidBodyException;
 import jules.pabst.application.monsterTradingCards.exception.JsonParserException;
+import jules.pabst.application.monsterTradingCards.repository.UserMemoryRepository;
+import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
@@ -17,6 +20,7 @@ public abstract class Controller {
 
     Controller() {
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new Jdk8Module());
         this.objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
 

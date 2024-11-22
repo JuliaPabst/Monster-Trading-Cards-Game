@@ -40,7 +40,7 @@ echo "Should return HTTP 4xx - User already exists"
 echo .
 curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"different\"}"
 echo "Should return HTTP 4xx - User already exists"
-echo . 
+echo .
 echo .
 
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi

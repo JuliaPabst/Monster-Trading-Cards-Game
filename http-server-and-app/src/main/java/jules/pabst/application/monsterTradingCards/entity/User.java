@@ -12,6 +12,7 @@ public class User {
     private int elo = 0;
     private int wins = 0;
     private int losses = 0;
+    private String token;
     private List<Card> deck;
     private List<Card> stack;
 
@@ -42,5 +43,13 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -12,8 +12,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService() {
-        this.userRepository = new UserMemoryRepository();
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public User create(User user) {
@@ -21,16 +21,16 @@ public class UserService {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        User existingUser = userRepository.findUserByName(user.getUsername());
+        Optional<User>  existingUser = userRepository.findUserByName(user.getUsername());
 
-        if (existingUser != null) {
+        if (existingUser.isPresent()) {
             throw new UserAlreadyExists("User already exists");
         }
 
         return userRepository.save(user);
     }
 
-    public User getUserByName(String name) {
+    public Optional<User> getUserByName(String name) {
         return userRepository.findUserByName(name);
     }
 }
