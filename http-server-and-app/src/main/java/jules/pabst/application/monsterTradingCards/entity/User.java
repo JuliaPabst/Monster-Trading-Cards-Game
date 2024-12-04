@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private String id = "";
+    private String uuid = "";
     private String username;
     private String password;
     private String bio = "";
@@ -29,12 +29,12 @@ public class User {
     }
 
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
-    public String getId() {
-        return id;
+    public String getUuid() {
+        return uuid;
     }
 
     public String getUsername() {

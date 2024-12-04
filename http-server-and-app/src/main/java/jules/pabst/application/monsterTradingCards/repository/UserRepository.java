@@ -10,6 +10,4 @@ public interface UserRepository {
     User save(User user);
 
     Optional<User> findUserByName(String name);
-
-    Optional<User> authenticate(String username, String password);
 }

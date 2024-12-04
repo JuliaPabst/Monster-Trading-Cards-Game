@@ -1,12 +1,12 @@
 package jules.pabst.application.monsterTradingCards.service;
 
+import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
-import jules.pabst.application.monsterTradingCards.repository.UserMemoryRepository;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class UserService {
 
@@ -16,7 +16,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User create(User user) {
+    public UserCreationDTO create(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
@@ -27,7 +27,11 @@ public class UserService {
             throw new UserAlreadyExists("User already exists");
         }
 
-        return userRepository.save(user);
+        user.setUuid(UUID.randomUUID().toString());
+
+        User createdUser = userRepository.save(user);
+
+        return new UserCreationDTO(createdUser.getUsername(), createdUser.getToken());
     }
 
     public Optional<User> getUserByName(String name) {

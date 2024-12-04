@@ -1,14 +1,11 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import jules.pabst.application.monsterTradingCards.DTOs.LoginTokenDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.TokenRequest;
-import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
-import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
-import jules.pabst.application.monsterTradingCards.repository.UserMemoryRepository;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 import jules.pabst.application.monsterTradingCards.service.TokenService;
-import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
@@ -33,7 +30,7 @@ public class SessionController extends Controller{
     private Response authenticate(Request request){
         try {
             TokenRequest tokenRequest = fromBody(request.getBody(), TokenRequest.class);
-            Optional<TokenRequest> authenticatedTokenRequest = tokenService.authenticate(tokenRequest);
+            Optional<LoginTokenDTO> authenticatedTokenRequest = tokenService.authenticate(tokenRequest);
 
             // to do: do not send back password
             return json(Status.OK, authenticatedTokenRequest);

@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS users (
+uuid VARCHAR(255) PRIMARY KEY,
+username VARCHAR(255) NOT NULL,
+password VARCHAR(255) NOT NULL,
+bio VARCHAR(500),
+image VARCHAR(255),
+elo INT,
+wins INT,
+losses INT,
+token VARCHAR(255)
+)
+
+DELETE FROM users;

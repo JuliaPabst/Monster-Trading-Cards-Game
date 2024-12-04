@@ -6,13 +6,9 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.exception.InvalidBodyException;
 import jules.pabst.application.monsterTradingCards.exception.JsonParserException;
-import jules.pabst.application.monsterTradingCards.repository.UserMemoryRepository;
-import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
-
-import java.io.IOException;
 
 public abstract class Controller {
 

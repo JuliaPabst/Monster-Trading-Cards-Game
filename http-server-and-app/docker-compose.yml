@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17
+    volumes:
+      - monster-trading-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: monster1
+      POSTGRES_USER: monster1
+      POSTGRES_DB: monster-trading-db
+    ports:
+      - "5432:5432"
+
+volumes:
+  monster-trading-db:
