@@ -3,6 +3,7 @@ package jules.pabst.application.monsterTradingCards.service;
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.NotNull;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.repository.CardMemoryRepository;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
@@ -20,19 +21,24 @@ public class CardService {
        this.cardRepository = cardRepository;
     }
 
-    public Card createCard(Card card, String packageId) {
+    public Card create(Card card) {
         if (card == null) {
-            throw new IllegalArgumentException("Card cannot be null");
+            throw new NotNull("Card cannot be null");
         }
 
+        if (card.getName() == null) {
+            throw new NotNull("Card name cannot be null");
+        }
+
+        System.out.println("This is one card being created" + card.getName());
         card.setId(UUID.randomUUID().toString());
 
-        card = cardRepository.save(card, packageId);
+        card = cardRepository.save(card);
 
-        return createdCard;
+        return card;
     }
 
-    public List<Card> getAll(){
+    public List<Optional<Card>> getAll(){
         return cardRepository.findAll();
     }
 }

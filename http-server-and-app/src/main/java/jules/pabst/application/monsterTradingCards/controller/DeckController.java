@@ -11,8 +11,8 @@ public class DeckController extends Controller {
     private final CardService cardsService;
 
 
-    public DeckController() {
-        this.cardsService = new CardService();
+    public DeckController(CardService cardsService) {
+        this.cardsService = cardsService;
     }
 
     @Override

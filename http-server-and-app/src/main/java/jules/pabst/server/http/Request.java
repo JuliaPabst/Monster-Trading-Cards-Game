@@ -26,6 +26,7 @@ public class Request {
         return this.header.get(name);
     }
 
+
     public void setHeader(String name, String value) {
         this.header.put(name, value);
     }

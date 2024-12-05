@@ -1,5 +1,6 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -29,6 +30,23 @@ public abstract class Controller {
         } catch (JsonProcessingException e) {
             throw new InvalidBodyException(e);
         }
+    }
+
+    protected <T> T arrayFromBody(String body, TypeReference<T> typeReference) {
+        try {
+//            System.out.println("Body: " + body);
+            return objectMapper.readValue(body, typeReference);
+        } catch (JsonProcessingException e) {
+            throw new InvalidBodyException(e);
+        }
+    }
+
+    protected String getAuthorizationHeader(Request request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || authHeader.isEmpty()) {
+            throw new RuntimeException("Authorization header is missing");
+        }
+        return authHeader;
     }
 
     protected Response json(Status status, Object object) {

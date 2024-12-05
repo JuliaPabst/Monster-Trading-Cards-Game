@@ -1,10 +1,11 @@
 package jules.pabst.application.monsterTradingCards;
 
 import jules.pabst.application.monsterTradingCards.controller.*;
-import jules.pabst.application.monsterTradingCards.repository.UserDbRepository;
-import jules.pabst.application.monsterTradingCards.repository.UserRepository;
+import jules.pabst.application.monsterTradingCards.repository.*;
 import jules.pabst.application.monsterTradingCards.routing.ControllerNotFound;
 import jules.pabst.application.monsterTradingCards.routing.Router;
+import jules.pabst.application.monsterTradingCards.service.CardService;
+import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.Application;
 import jules.pabst.server.http.Request;
@@ -49,11 +50,15 @@ public class MonsterTradingCardsApplication implements Application {
         ConnectionPool connectionPool = new ConnectionPool();
         UserRepository userRepository = new UserDbRepository(connectionPool);
         UserService userService = new UserService(userRepository);
+        CardDbRepository cardRepository = new CardDbRepository(connectionPool);
+        CardService cardService = new CardService(cardRepository);
+        PackageRepository packageRepository = new PackageDbRepository(connectionPool);
+        PackageService packageService = new PackageService(packageRepository);
 
-        this.router.addRoute("/cards", new CardsController());
-        this.router.addRoute("/deck", new DeckController());
+        this.router.addRoute("/cards", new CardsController(cardService));
+        this.router.addRoute("/deck", new DeckController(cardService));
         this.router.addRoute("/sessions", new SessionController(userRepository));
-
+        this.router.addRoute("/packages", new PackageController(cardService, packageService));
         this.router.addRoute("/users", new UsersController(userService));
     }
 }

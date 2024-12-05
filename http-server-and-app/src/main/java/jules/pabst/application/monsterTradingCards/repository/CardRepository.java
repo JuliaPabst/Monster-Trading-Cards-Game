@@ -5,8 +5,9 @@ import jules.pabst.application.monsterTradingCards.entity.CardType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public interface CardRepository {
-    public List<Card> findAll();
-    public Card create(Card card, String packageId);
+    public List<Optional<Card>> findAll();
+    public Card save(Card card);
 }

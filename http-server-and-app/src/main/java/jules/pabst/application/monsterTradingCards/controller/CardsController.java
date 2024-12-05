@@ -1,6 +1,7 @@
 package jules.pabst.application.monsterTradingCards.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.entity.Card;
+import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.service.CardService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
@@ -10,13 +11,15 @@ import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Status;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Optional;
 
 public class CardsController extends Controller {
     private final CardService cardsService;
 
-    public CardsController() {
-        this.cardsService = new CardService();
+    public CardsController(CardService cardsService) {
+        this.cardsService = cardsService;
     }
 
     @Override
@@ -29,9 +32,13 @@ public class CardsController extends Controller {
     }
 
     public Response read() {
-        List<Card> cards = cardsService.getAll();
+        List<Optional<Card>> cards = cardsService.getAll();
 
-        return json(Status.OK, cards);
+        if (!cards.isEmpty()) {
+            return json(Status.OK, cards);
+        } else {
+            return json(Status.NOT_FOUND, new ErrorResponse("Cards not found"));
+        }
     }
 
 
