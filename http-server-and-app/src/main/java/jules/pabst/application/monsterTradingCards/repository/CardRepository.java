@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CardRepository {
     public List<Card> findAll();
+    public Card create(Card card, String packageId);
 }

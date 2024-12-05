@@ -35,16 +35,10 @@ public class UsersController extends Controller {
         try {
             User user = fromBody(request.getBody(), User.class);
             UserCreationDTO userCreationDTO = userService.create(user);
-
-            // to do: do not send back password
-
-            // Jackson Framework: Views über Felder schreiben, was zu welcher View gehört
-            // aus neue UserDTO Klasse - Entity Objekt in DTO Objekt verwandeln
             return json(Status.CREATED, userCreationDTO);
         } catch (UserAlreadyExists e) {
             return json(Status.CONFLICT, new ErrorResponse("User already exists"));
         }
-
     }
 
     private Response readUserByName(Request request) {

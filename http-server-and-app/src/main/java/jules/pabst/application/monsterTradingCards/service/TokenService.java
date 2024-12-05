@@ -15,13 +15,22 @@ public class TokenService {
     }
 
     public Optional<LoginTokenDTO> authenticate(TokenRequest tokenRequest){
-        Optional<User> user = this.userRepository.findUserByName(tokenRequest.getUsername());
-        if(user.isPresent() && user.get().getPassword().equals(tokenRequest.getPassword())){
-            Optional<LoginTokenDTO> loginTokenDTO = new LoginTokenDTO(tokenRequest.getUsername(), tokenRequest.getToken());
-            tokenRequest.setToken("%s-mtcgToken".formatted(tokenRequest.getUsername()));
-            return Optional.of(loginTokenDTO);
+        try {
+            Optional<User> user = this.userRepository.findUserByName(tokenRequest.getUsername());
+
+            if (user.isPresent() && user.get().getPassword().equals(tokenRequest.getPassword())) {
+                tokenRequest.setToken("%s-mtcgToken".formatted(tokenRequest.getUsername()));
+                return Optional.of(new LoginTokenDTO(tokenRequest.getUsername(), tokenRequest.getToken()));
+            }
+
+            throw new InvalidUserCredentials("Invalid User Credentials");
+        } catch (InvalidUserCredentials e) {
+            System.err.println("Error: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            throw new RuntimeException("Unexpected error during login", e);
         }
 
-        throw new InvalidUserCredentials("Invalid User Credentials");
     }
 }

@@ -8,6 +8,18 @@ elo INT,
 wins INT,
 losses INT,
 token VARCHAR(255)
-)
+);
 
 DELETE FROM users;
+
+CREATE TABLE IF NOT EXISTS packages (
+    id VARCHAR(255) PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS cards (
+id VARCHAR(255) PRIMARY KEY,
+name VARCHAR(255) NOT NULL,
+damage INT NOT NULL,
+packageId VARCHAR(255),
+FOREIGN KEY (packageId) REFERENCES packages(id)
+);
