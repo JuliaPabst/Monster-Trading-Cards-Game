@@ -10,4 +10,8 @@ public interface UserRepository {
     User save(User user);
 
     Optional<User> findUserByName(String name);
+
+    void updateCredits(User user);
+
+    int readCurrentCredit(User user);
 }

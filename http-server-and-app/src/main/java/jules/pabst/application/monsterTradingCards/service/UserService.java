@@ -5,6 +5,7 @@ import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +36,15 @@ public class UserService {
     }
 
     public Optional<User> getUserByName(String name) {
+        return userRepository.findUserByName(name);
+    }
+
+    public Optional<User> getUserByAuthenticationToken(String authenticationToken) {
+        String token = authenticationToken.split(" ")[1];
+        String name = token.split("-")[0];
+
+        System.out.println("Username: " + name);
+
         return userRepository.findUserByName(name);
     }
 }

@@ -1,7 +1,11 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
+import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
 import jules.pabst.application.monsterTradingCards.entity.Card;
+import jules.pabst.application.monsterTradingCards.entity.CardPackage;
+import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.AllPackagesOwned;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +18,10 @@ import java.util.Optional;
 public class PackageDbRepository implements PackageRepository {
     private final static String NEW_PACKAGE
             = "INSERT INTO packages VALUES (?)";
+
+    private final static String FIND_PACKAGES_WITHOUT_OWNER = "SELECT * FROM packages WHERE owner IS NULL";
+    private final static String UPDATE_PACKAGE
+            = "UPDATE packages SET owner = ? WHERE id = ?";
     private final ConnectionPool connectionPool;
 
     public PackageDbRepository(ConnectionPool connectionPool) {
@@ -29,6 +37,48 @@ public class PackageDbRepository implements PackageRepository {
             preparedStatement.setString(1, packageId);
             preparedStatement.execute();
             return packageId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String findPackageWithoutOwner(){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_WITHOUT_OWNER);
+        ) {
+           List<CardPackage> packages = new ArrayList<>();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                System.out.println("id: %s".formatted(resultSet.getString("id")));
+                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner")));
+                packages.add(newPackage);
+            }
+
+            if (!packages.isEmpty()) {
+                System.out.println("-----------------");
+                return packages.get(0).getId();
+            }
+
+            throw(new AllPackagesOwned("All Packages are already owned by someone"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public AquirePackageDTO updatePackage(String packageId, User user){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PACKAGE)
+        ) {
+            System.out.println("Updating package with ID: " + packageId);
+            System.out.println("Setting owner to: " + user.getUuid());
+            preparedStatement.setString(1, user.getUuid());
+            preparedStatement.setString(2, packageId);
+            preparedStatement.execute();
+            return new AquirePackageDTO(packageId, user.getUuid());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

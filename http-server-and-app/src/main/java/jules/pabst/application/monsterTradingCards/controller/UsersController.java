@@ -28,7 +28,7 @@ public class UsersController extends Controller {
             return readUserByName(request);
         }
 
-        return json(Status.OK, null);
+        return json(Status.INTERNAL_SERVER_ERROR,  new ErrorResponse("Internal Server Error"));
     }
 
     private Response create(Request request) {

@@ -13,6 +13,7 @@ public class User {
     private int wins = 0;
     private int losses = 0;
     private String token;
+    private int credit;
     private List<Card> deck;
     private List<Card> stack;
 
@@ -21,11 +22,13 @@ public class User {
         this.stack = new ArrayList<>();
     }
 
-    public User(String username, String password) {
+    public User(String uuid, String username, String password) {
         this.deck = new ArrayList<Card>();
         this.stack = new ArrayList<Card>();
         this.username = username;
         this.password = password;
+        this.uuid = uuid;
+        this.credit = 20;
     }
 
 
@@ -51,5 +54,14 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+
+    public int getCredit() {
+        return credit;
+    }
+
+    public void setCredit(int credit) {
+        this.credit = credit;
     }
 }

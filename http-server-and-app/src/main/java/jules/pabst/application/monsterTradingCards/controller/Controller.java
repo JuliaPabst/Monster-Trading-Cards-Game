@@ -34,7 +34,7 @@ public abstract class Controller {
 
     protected <T> T arrayFromBody(String body, TypeReference<T> typeReference) {
         try {
-//            System.out.println("Body: " + body);
+            System.out.println("Body: " + body);
             return objectMapper.readValue(body, typeReference);
         } catch (JsonProcessingException e) {
             throw new InvalidBodyException(e);

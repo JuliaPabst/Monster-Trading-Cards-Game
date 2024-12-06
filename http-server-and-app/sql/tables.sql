@@ -10,6 +10,8 @@ losses INT,
 token VARCHAR(255)
 );
 
+ALTER TABLE users ADD COLUMN credit int;
+
 DELETE FROM users;
 
 CREATE TABLE IF NOT EXISTS packages (
@@ -22,6 +24,8 @@ ALTER TABLE packages
 ALTER TABLE packages
     ADD CONSTRAINT fk_owner FOREIGN KEY (owner) REFERENCES users(uuid);
 
+DELETE FROM packages;
+
 CREATE TABLE IF NOT EXISTS cards (
 id VARCHAR(255) PRIMARY KEY,
 name VARCHAR(255) NOT NULL,
@@ -29,3 +33,5 @@ damage INT NOT NULL,
 packageId VARCHAR(255),
 FOREIGN KEY (packageId) REFERENCES packages(id)
 );
+
+DELETE FROM cards;

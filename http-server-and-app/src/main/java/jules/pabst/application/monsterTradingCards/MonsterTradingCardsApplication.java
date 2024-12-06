@@ -30,6 +30,7 @@ public class MonsterTradingCardsApplication implements Application {
         try {
             Controller controller
                     = this.router.getController(request.getPath());
+            System.out.println(request.getPath());
             return controller.handle(request);
 
         } catch (ControllerNotFound e) {
@@ -53,11 +54,12 @@ public class MonsterTradingCardsApplication implements Application {
         CardDbRepository cardRepository = new CardDbRepository(connectionPool);
         CardService cardService = new CardService(cardRepository);
         PackageRepository packageRepository = new PackageDbRepository(connectionPool);
-        PackageService packageService = new PackageService(packageRepository);
+        PackageService packageService = new PackageService(packageRepository, userRepository);
 
         this.router.addRoute("/cards", new CardsController(cardService));
         this.router.addRoute("/deck", new DeckController(cardService));
         this.router.addRoute("/sessions", new SessionController(userRepository));
+        this.router.addRoute("/transactions/packages", new TransactionsController(userService, packageService));
         this.router.addRoute("/packages", new PackageController(cardService, packageService));
         this.router.addRoute("/users", new UsersController(userService));
     }
