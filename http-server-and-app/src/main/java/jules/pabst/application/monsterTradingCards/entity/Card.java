@@ -8,6 +8,7 @@ import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredenti
 public class Card {
     private String id;
     private String packageId;
+    private String deckUserId;
     private CardType name;
     private float damage;
 
@@ -20,7 +21,8 @@ public class Card {
     public Card(@JsonProperty("Id") String id,
                 @JsonProperty("Name") String name,
                 @JsonProperty("Damage") float damage,
-                @JsonProperty("PackageId") String packageId) {
+                @JsonProperty("PackageId") String packageId,
+                @JsonProperty("DeckUserId") String deckUserId) {
         this.id = id;
         try {
             this.name = CardType.valueOf(name);
@@ -29,6 +31,7 @@ public class Card {
         }
         this.damage = damage;
         this.packageId = packageId;
+        this.deckUserId = deckUserId;
     }
 
     public String getId() {

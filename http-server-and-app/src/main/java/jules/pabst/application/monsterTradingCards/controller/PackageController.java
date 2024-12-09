@@ -44,7 +44,6 @@ public class PackageController extends Controller {
                 System.out.println("Number of cards:" + cards.size());
                 cards.forEach(card -> {
                     card.setPackageId(finalPackageId);
-//                  System.out.println("HI" + card.getName());
                     card = cardService.create(card);
                 });
 
