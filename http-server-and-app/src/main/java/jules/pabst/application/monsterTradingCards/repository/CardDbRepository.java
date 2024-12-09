@@ -18,7 +18,7 @@ public class CardDbRepository implements CardRepository {
             = "INSERT INTO cards VALUES (?, ?, ?, ?)";
     private final static String ALL_CARDS
             = "SELECT * FROM cards";
-    private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where packageId = ?";
+    private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where package_id = ?";
     private final ConnectionPool connectionPool;
 
     public CardDbRepository(ConnectionPool connectionPool) {
@@ -52,7 +52,7 @@ public class CardDbRepository implements CardRepository {
         ) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"));
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"));
                 cards.add(Optional.of(card));
             }
         } catch (SQLException e) {
@@ -75,7 +75,7 @@ public class CardDbRepository implements CardRepository {
                 preparedStatement.setString(1, cardPackage.getId());
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
-                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"));
+                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"));
                     cards.add(card);
                 }
             } catch (SQLException e) {

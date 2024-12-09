@@ -19,7 +19,8 @@ public class Card {
 
     public Card(@JsonProperty("Id") String id,
                 @JsonProperty("Name") String name,
-                @JsonProperty("Damage") float damage) {
+                @JsonProperty("Damage") float damage,
+                @JsonProperty("PackageId") String packageId) {
         this.id = id;
         try {
             this.name = CardType.valueOf(name);
@@ -27,6 +28,7 @@ public class Card {
             throw new InvalidCardType("Invalid card type: " + name);
         }
         this.damage = damage;
+        this.packageId = packageId;
     }
 
     public String getId() {

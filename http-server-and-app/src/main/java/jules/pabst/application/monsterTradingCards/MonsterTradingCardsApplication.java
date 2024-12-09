@@ -5,6 +5,7 @@ import jules.pabst.application.monsterTradingCards.repository.*;
 import jules.pabst.application.monsterTradingCards.routing.ControllerNotFound;
 import jules.pabst.application.monsterTradingCards.routing.Router;
 import jules.pabst.application.monsterTradingCards.service.CardService;
+import jules.pabst.application.monsterTradingCards.service.DeckService;
 import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.Application;
@@ -55,6 +56,7 @@ public class MonsterTradingCardsApplication implements Application {
         PackageService packageService = new PackageService(packageRepository, userRepository);
         CardDbRepository cardRepository = new CardDbRepository(connectionPool);
         CardService cardService = new CardService(cardRepository, packageRepository);
+        DeckService deckservice = new DeckService(cardRepository, userRepository);
 
         this.router.addRoute("/cards", new CardsController(cardService, userService, packageService));
         this.router.addRoute("/deck", new DeckController(cardService));

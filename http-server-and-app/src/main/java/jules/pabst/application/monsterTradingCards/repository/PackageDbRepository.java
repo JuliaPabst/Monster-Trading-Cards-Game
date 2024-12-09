@@ -19,10 +19,10 @@ public class PackageDbRepository implements PackageRepository {
     private final static String NEW_PACKAGE
             = "INSERT INTO packages VALUES (?)";
 
-    private final static String FIND_PACKAGES_WITHOUT_OWNER = "SELECT * FROM packages WHERE owner IS NULL";
-    private final static String FIND_PACKAGES_BY_OWNER = "SELECT * FROM packages WHERE owner = ?";
+    private final static String FIND_PACKAGES_WITHOUT_OWNER = "SELECT * FROM packages WHERE owner_id IS NULL";
+    private final static String FIND_PACKAGES_BY_OWNER = "SELECT * FROM packages WHERE owner_id = ?";
     private final static String UPDATE_PACKAGE
-            = "UPDATE packages SET owner = ? WHERE id = ?";
+            = "UPDATE packages SET owner_id = ? WHERE id = ?";
 
     private final ConnectionPool connectionPool;
 
@@ -54,7 +54,7 @@ public class PackageDbRepository implements PackageRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 System.out.println("id: %s".formatted(resultSet.getString("id")));
-                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner")));
+                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner_id")));
                 packages.add(newPackage);
             }
 
@@ -98,7 +98,7 @@ public class PackageDbRepository implements PackageRepository {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 System.out.println("id: %s".formatted(resultSet.getString("id")));
-                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner")));
+                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner_id")));
                 packages.add(newPackage);
             }
 

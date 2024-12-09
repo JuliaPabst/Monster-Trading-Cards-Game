@@ -35,3 +35,11 @@ FOREIGN KEY (packageId) REFERENCES packages(id)
 );
 
 DELETE FROM cards;
+
+CREATE TABLE IF NOT EXISTS decks (
+    id VARCHAR(255) PRIMARY KEY,
+    ownerId VARCHAR(255),
+    FOREIGN KEY (ownerId) REFERENCES users(uuid)
+);
+
+ALTER TABLE cards ADD COLUMN deckId int;
