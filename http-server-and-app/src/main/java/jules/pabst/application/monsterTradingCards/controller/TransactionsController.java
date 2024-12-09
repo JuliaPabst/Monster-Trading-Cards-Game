@@ -3,7 +3,9 @@ package jules.pabst.application.monsterTradingCards.controller;
 import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.AllPackagesOwned;
 import jules.pabst.application.monsterTradingCards.exception.CouldNotAquirePackage;
+import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
 import jules.pabst.application.monsterTradingCards.exception.NotEnoughCredit;
 import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
@@ -32,21 +34,25 @@ public class TransactionsController extends Controller{
 
     public Response aquirePackage(Request request){
         try {
-            String authenticationToken = request.getHeader("Authorization");
+            String authenticationToken = getAuthorizationHeader(request);
             Optional<User> user = userService.getUserByAuthenticationToken(authenticationToken);
             if(user.isPresent()){
                 AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(user.get());
                 if(aquirePackageDTO != null){
-                    return json(Status.OK, aquirePackageDTO);
+                    return json(Status.CREATED, aquirePackageDTO);
                 }
                 return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("User does not have enough credit"));
             }
 
             return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
         } catch(NotEnoughCredit e) {
-            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("Not enough credit to acquire a package"));
+            return json(Status.PAYMENT_REQUIRED, new ErrorResponse("Not enough credit to acquire a package"));
+        } catch(AllPackagesOwned e) {
+            return json(Status.CONFLICT, new ErrorResponse("No packages available"));
+        } catch(MissingAuthorizationHeader e){
+            return json(Status.UNAUTHORIZED, new ErrorResponse("Missing authorization header"));
         } catch(CouldNotAquirePackage e){
-            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("Could not aquire package"));
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("Aquiring package failed"));
         }
     }
 }

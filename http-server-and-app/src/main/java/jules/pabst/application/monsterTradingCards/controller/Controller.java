@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jules.pabst.application.monsterTradingCards.exception.InvalidBodyException;
 import jules.pabst.application.monsterTradingCards.exception.JsonParserException;
+import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
@@ -44,7 +45,8 @@ public abstract class Controller {
     protected String getAuthorizationHeader(Request request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isEmpty()) {
-            throw new RuntimeException("Authorization header is missing");
+            System.out.println("Authorization header: " + authHeader);
+            throw new MissingAuthorizationHeader("Authorization header is missing");
         }
         return authHeader;
     }

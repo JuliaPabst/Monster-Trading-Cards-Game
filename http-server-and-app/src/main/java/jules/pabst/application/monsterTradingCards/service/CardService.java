@@ -1,24 +1,24 @@
 package jules.pabst.application.monsterTradingCards.service;
 
-import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.entity.Card;
+import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 import jules.pabst.application.monsterTradingCards.exception.NotNull;
-import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
-import jules.pabst.application.monsterTradingCards.repository.CardMemoryRepository;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
-import jules.pabst.application.monsterTradingCards.repository.UserRepository;
+import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class CardService {
 
     private final CardRepository cardRepository;
+    private final PackageRepository packageRepository;
 
-    public CardService(CardRepository cardRepository) {
+    public CardService(CardRepository cardRepository, PackageRepository packageRepository) {
        this.cardRepository = cardRepository;
+       this.packageRepository = packageRepository;
     }
 
     public Card create(Card card) {
@@ -38,7 +38,11 @@ public class CardService {
         return card;
     }
 
-    public List<Optional<Card>> getAll(){
-        return cardRepository.findAll();
+    public List<Card> readByUserToken(User user){
+        List<CardPackage> packagesOwnedByUser = packageRepository.findPackagesByOwner(user);
+        if(!packagesOwnedByUser.isEmpty()){
+            return cardRepository.findCardsByPackage(packagesOwnedByUser);
+        }
+        throw new CardsNotFound("This user does not own any cards");
     }
 }

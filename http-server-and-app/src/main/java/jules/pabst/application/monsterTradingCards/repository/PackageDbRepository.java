@@ -2,10 +2,10 @@ package jules.pabst.application.monsterTradingCards.repository;
 
 import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
-import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.AllPackagesOwned;
+import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,8 +20,10 @@ public class PackageDbRepository implements PackageRepository {
             = "INSERT INTO packages VALUES (?)";
 
     private final static String FIND_PACKAGES_WITHOUT_OWNER = "SELECT * FROM packages WHERE owner IS NULL";
+    private final static String FIND_PACKAGES_BY_OWNER = "SELECT * FROM packages WHERE owner = ?";
     private final static String UPDATE_PACKAGE
             = "UPDATE packages SET owner = ? WHERE id = ?";
+
     private final ConnectionPool connectionPool;
 
     public PackageDbRepository(ConnectionPool connectionPool) {
@@ -46,7 +48,7 @@ public class PackageDbRepository implements PackageRepository {
     public String findPackageWithoutOwner(){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_WITHOUT_OWNER);
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_WITHOUT_OWNER)
         ) {
            List<CardPackage> packages = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -79,6 +81,33 @@ public class PackageDbRepository implements PackageRepository {
             preparedStatement.setString(2, packageId);
             preparedStatement.execute();
             return new AquirePackageDTO(packageId, user.getUuid());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<CardPackage> findPackagesByOwner(User user){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_BY_OWNER)
+        ) {
+            List<CardPackage> packages = new ArrayList<>();
+
+            preparedStatement.setString(1, user.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                System.out.println("id: %s".formatted(resultSet.getString("id")));
+                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner")));
+                packages.add(newPackage);
+            }
+
+            if (!packages.isEmpty()) {
+                System.out.println("-----------------");
+                return packages;
+            }
+
+            throw(new NoPackagesOwned("This user does not own any packages"));
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

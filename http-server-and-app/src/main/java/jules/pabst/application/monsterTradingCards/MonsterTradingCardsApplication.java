@@ -51,12 +51,12 @@ public class MonsterTradingCardsApplication implements Application {
         ConnectionPool connectionPool = new ConnectionPool();
         UserRepository userRepository = new UserDbRepository(connectionPool);
         UserService userService = new UserService(userRepository);
-        CardDbRepository cardRepository = new CardDbRepository(connectionPool);
-        CardService cardService = new CardService(cardRepository);
         PackageRepository packageRepository = new PackageDbRepository(connectionPool);
         PackageService packageService = new PackageService(packageRepository, userRepository);
+        CardDbRepository cardRepository = new CardDbRepository(connectionPool);
+        CardService cardService = new CardService(cardRepository, packageRepository);
 
-        this.router.addRoute("/cards", new CardsController(cardService));
+        this.router.addRoute("/cards", new CardsController(cardService, userService, packageService));
         this.router.addRoute("/deck", new DeckController(cardService));
         this.router.addRoute("/sessions", new SessionController(userRepository));
         this.router.addRoute("/transactions/packages", new TransactionsController(userService, packageService));

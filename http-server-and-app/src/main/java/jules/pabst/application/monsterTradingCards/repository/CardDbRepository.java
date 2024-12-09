@@ -2,7 +2,8 @@ package jules.pabst.application.monsterTradingCards.repository;
 
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
 import jules.pabst.application.monsterTradingCards.entity.Card;
-import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.entity.CardPackage;
+import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,6 +18,7 @@ public class CardDbRepository implements CardRepository {
             = "INSERT INTO cards VALUES (?, ?, ?, ?)";
     private final static String ALL_CARDS
             = "SELECT * FROM cards";
+    private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where packageId = ?";
     private final ConnectionPool connectionPool;
 
     public CardDbRepository(ConnectionPool connectionPool) {
@@ -59,5 +61,33 @@ public class CardDbRepository implements CardRepository {
         }
 
         return cards;
+    }
+
+    public List<Card> findCardsByPackage(List<CardPackage> cardPackages){
+        List<Card> cards = new ArrayList<>();
+
+        for(CardPackage cardPackage : cardPackages){
+            try (
+                    Connection connection = connectionPool.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_PACKAGE);
+            ) {
+
+                preparedStatement.setString(1, cardPackage.getId());
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"));
+                    cards.add(card);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (!cards.isEmpty()) {
+            return cards;
+        }
+
+        throw new CardsNotFound("No cards belonging to the requested package");
     }
 }
