@@ -14,17 +14,8 @@ public class User {
     private int losses = 0;
     private String token;
     private int credit;
-    private List<Card> deck;
-    private List<Card> stack;
-
-    public User() {
-        this.deck = new ArrayList<>();
-        this.stack = new ArrayList<>();
-    }
 
     public User(String uuid, String username, String password) {
-        this.deck = new ArrayList<Card>();
-        this.stack = new ArrayList<Card>();
         this.username = username;
         this.password = password;
         this.uuid = uuid;
@@ -57,11 +48,31 @@ public class User {
     }
 
 
+    public String getBio() {
+        return bio;
+    }
+
+    public int getElo() {
+        return elo;
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
+    public int getLosses() {
+        return losses;
+    }
+
     public int getCredit() {
         return credit;
     }
 
     public void setCredit(int credit) {
         this.credit = credit;
+    }
+
+    public String getImage() {
+        return image;
     }
 }

@@ -1,9 +1,11 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
+import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
+import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
@@ -42,13 +44,21 @@ public class UsersController extends Controller {
     }
 
     private Response readUserByName(Request request) {
-        String[] pathParts = request.getPath().split("/");
-        String name = pathParts[1];
-        Optional<User> user = userService.getUserByName(name);
-        if (user.isPresent()) {
+        try {
+            String[] pathParts = request.getPath().split("/");
+            String name = "";
+            if(pathParts.length < 3) {
+                name = pathParts[1];
+            } else {
+                name = pathParts[2];
+            }
+
+            UserDTO user = userService.getUserByName(name);
+
             return json(Status.OK, user);
-        } else {
+        } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
         }
+
     }
 }

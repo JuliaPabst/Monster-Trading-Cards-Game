@@ -1,8 +1,10 @@
 package jules.pabst.application.monsterTradingCards.service;
 
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
+import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
+import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 
 import java.util.List;
@@ -35,8 +37,21 @@ public class UserService {
         return new UserCreationDTO(createdUser.getUsername(), createdUser.getToken());
     }
 
-    public Optional<User> getUserByName(String name) {
-        return userRepository.findUserByName(name);
+    public UserDTO getUserByName(String name) {
+        Optional<User> user = userRepository.findUserByName(name);
+        if (user.isPresent()) {
+            UserDTO userDTO = new UserDTO(
+                    user.get().getUuid(),
+                    user.get().getUsername(),
+                    user.get().getBio(),
+                    user.get().getImage(),
+                    user.get().getElo(),
+                    user.get().getWins(),
+                    user.get().getLosses(),
+                    user.get().getCredit());
+            return userDTO;
+        }
+        throw new UserNotFound("User not found");
     }
 
     public Optional<User> getUserByAuthenticationToken(String authenticationToken) {
