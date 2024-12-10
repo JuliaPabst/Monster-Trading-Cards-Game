@@ -21,6 +21,8 @@ public class CardDbRepository implements CardRepository {
             = "SELECT * FROM cards";
     private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where package_id = ?";
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
+    private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
+    private final static String UPDATED_CARDS = "UPDATE cards set deck_user_id = ? where id = ?";
     private final ConnectionPool connectionPool;
 
     public CardDbRepository(ConnectionPool connectionPool) {
@@ -106,6 +108,53 @@ public class CardDbRepository implements CardRepository {
                 Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
                 cards.add(card);
             }
+            return cards;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<Card> findCardsById(List<String> ids){
+        List<Card> cards = new ArrayList<>();
+
+        for(String id : ids){
+            try (
+                    Connection connection = connectionPool.getConnection();
+                    PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_CARD_ID);
+            ) {
+                System.out.println("Querying cards for ID: " + id);
+                preparedStatement.setString(1, id);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                    cards.add(card);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (cards.size() == ids.size()) {
+            return cards;
+        }
+
+        throw new CardsNotFound("No cards belonging to the provided ids");
+    }
+
+    public List<Card> updateDeckUserId(List<Card> cards){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARDS);
+        ) {
+            for(Card card : cards){
+                preparedStatement.setString(1, card.getDeckUserId());
+                preparedStatement.setString(2, card.getId());
+                preparedStatement.execute();
+                System.out.println("Updated card: " + card.getId());
+            }
+
             return cards;
         } catch (SQLException e) {
             e.printStackTrace();

@@ -14,4 +14,6 @@ public interface CardRepository {
     public Card save(Card card);
     public List<Card> findCardsByPackage(List<CardPackage>  cardPackages);
     public List<Card> findCardsByDeck(User user);
+    public List<Card> findCardsById(List<String> cardIds);
+    public List<Card> updateDeckUserId(List<Card> cards);
 }

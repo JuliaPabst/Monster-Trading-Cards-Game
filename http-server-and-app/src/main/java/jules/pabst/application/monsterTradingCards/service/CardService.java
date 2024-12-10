@@ -4,6 +4,7 @@ import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
+import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
 import jules.pabst.application.monsterTradingCards.exception.NotNull;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
@@ -31,7 +32,7 @@ public class CardService {
         }
 
         System.out.println("This is one card being created" + card.getName());
-        card.setId(UUID.randomUUID().toString());
+        System.out.println("This is the id: " + card.getId());
 
         card = cardRepository.save(card);
 
@@ -39,10 +40,15 @@ public class CardService {
     }
 
     public List<Card> readByUserToken(User user){
-        List<CardPackage> packagesOwnedByUser = packageRepository.findPackagesByOwner(user);
-        if(!packagesOwnedByUser.isEmpty()){
-            return cardRepository.findCardsByPackage(packagesOwnedByUser);
+        try{
+            List<CardPackage> packagesOwnedByUser = packageRepository.findPackagesByOwner(user);
+            if(!packagesOwnedByUser.isEmpty()){
+                return cardRepository.findCardsByPackage(packagesOwnedByUser);
+            }
+            throw new CardsNotFound("This user does not own any cards");
+        } catch(NoPackagesOwned e){
+            throw new NoPackagesOwned("This user does not own any cards");
         }
-        throw new CardsNotFound("This user does not own any cards");
+
     }
 }

@@ -42,6 +42,14 @@ public class Card {
         this.id = id;
     }
 
+    public String getDeckUserId() {
+        return deckUserId;
+    }
+
+    public void setDeckUserId(String deckUserId) {
+        this.deckUserId = deckUserId;
+    }
+
     public String getPackageId() {
         return packageId;
     }
@@ -61,8 +69,6 @@ public class Card {
             throw new InvalidCardType("Invalid card type: " + name);
         }
     }
-
-
 
     public float getDamage() {
         return damage;

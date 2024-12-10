@@ -3,10 +3,7 @@ package jules.pabst.application.monsterTradingCards.controller;
 import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
-import jules.pabst.application.monsterTradingCards.exception.AllPackagesOwned;
-import jules.pabst.application.monsterTradingCards.exception.CouldNotAquirePackage;
-import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
-import jules.pabst.application.monsterTradingCards.exception.NotEnoughCredit;
+import jules.pabst.application.monsterTradingCards.exception.*;
 import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
@@ -47,6 +44,8 @@ public class TransactionsController extends Controller{
             return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
         } catch(NotEnoughCredit e) {
             return json(Status.PAYMENT_REQUIRED, new ErrorResponse("Not enough credit to acquire a package"));
+        } catch(NoPackagesOwned e) {
+            return json(Status.BAD_REQUEST, new ErrorResponse("No packages owned"));
         } catch(AllPackagesOwned e) {
             return json(Status.CONFLICT, new ErrorResponse("No packages available"));
         } catch(MissingAuthorizationHeader e){
