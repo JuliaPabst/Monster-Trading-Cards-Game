@@ -23,6 +23,7 @@ public class UserDbRepository implements UserRepository {
     private final static String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final static String FIND_USER_BY_TOKEN = "SELECT * FROM users WHERE token = ?";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
+    private final static String UPDATE_TOKEN = "UPDATE users SET token = ? WHERE uuid = ?";
     private final static String UPDATE_CREDITS = "UPDATE users SET credit = ? WHERE username = ?";
     private final static String UPDATE_USERDATA = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
     private final ConnectionPool connectionPool;
@@ -89,6 +90,22 @@ public class UserDbRepository implements UserRepository {
         }
 
         return Optional.empty();
+    }
+
+    public void updateToken(User user, String token){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TOKEN)
+        ) {
+            int newCredit = user.getCredit() - 5;
+            System.out.println("Uuid: %s".formatted(user.getUuid()));
+            preparedStatement.setString(1, token);
+            preparedStatement.setString(2, user.getUuid());
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     public int readCurrentCredit(User user) {

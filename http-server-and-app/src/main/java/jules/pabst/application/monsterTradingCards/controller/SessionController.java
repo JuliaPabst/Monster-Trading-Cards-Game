@@ -30,9 +30,8 @@ public class SessionController extends Controller{
     private Response authenticate(Request request){
         try {
             TokenRequest tokenRequest = fromBody(request.getBody(), TokenRequest.class);
-            Optional<LoginTokenDTO> authenticatedTokenRequest = tokenService.authenticate(tokenRequest);
+            LoginTokenDTO authenticatedTokenRequest = tokenService.authenticate(tokenRequest);
 
-            // to do: do not send back password
             return json(Status.OK, authenticatedTokenRequest);
         } catch (InvalidUserCredentials e) {
             return json(Status.UNAUTHORIZED, new ErrorResponse("Invalid User Credentials"));

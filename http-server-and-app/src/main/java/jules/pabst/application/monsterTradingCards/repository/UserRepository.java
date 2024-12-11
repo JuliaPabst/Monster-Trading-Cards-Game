@@ -16,6 +16,8 @@ public interface UserRepository {
 
     void updateCredits(User user);
 
+    void updateToken(User user, String token);
+
     int readCurrentCredit(User user);
 
     UserDTO updateUserData(String originalUsername, UserDTO userDTO);
