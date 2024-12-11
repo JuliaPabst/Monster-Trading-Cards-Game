@@ -31,7 +31,7 @@ public class TransactionsController extends Controller{
 
     public Response aquirePackage(Request request){
         try {
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             Optional<User> user = userService.getUserByAuthenticationToken(authenticationToken);
             if(user.isPresent()){
                 AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(user.get());

@@ -33,12 +33,12 @@ public class PackageController extends Controller {
     }
 
     public Response create(Request request){
-        String authHeader = getAuthorizationHeader(request);
+        String authToken = getAuthorizationToken(request);
         List<Card> cards = arrayFromBody(request.getBody(), new TypeReference<List<Card>>() {});
 
         String packageId = UUID.randomUUID().toString();
         try{
-            if(authHeader.equals("Bearer admin-mtcgToken")){
+            if(authToken.equals("admin-mtcgToken")){
                 packageId = packageService.create(packageId);
                 String finalPackageId = packageId;
                 System.out.println("Number of cards:" + cards.size());

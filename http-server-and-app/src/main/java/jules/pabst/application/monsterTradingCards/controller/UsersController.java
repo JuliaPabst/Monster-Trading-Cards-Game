@@ -57,7 +57,7 @@ public class UsersController extends Controller {
                 name = pathParts[2];
             }
 
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             UserDTO user2 = userService.getUserByName(name, authenticationToken);
             return json(Status.OK, user2);
         } catch(UserNotFound e){
@@ -69,7 +69,7 @@ public class UsersController extends Controller {
 
     private Response putUserData(Request request) {
         try{
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             UserUpdateDTO user = fromBody(request.getBody(), UserUpdateDTO.class);
             UserDTO userDTO = userService.updateUserData(user, authenticationToken);
             return json(Status.OK, userDTO);

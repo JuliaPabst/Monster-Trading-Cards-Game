@@ -17,17 +17,6 @@ for arg in "$@"; do
     fi
 done
 
-echo "2) Login Users"
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
-echo "should return HTTP 200 with generated token for the user, here: kienboec-mtcgToken"
-echo .
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"altenhof\", \"Password\":\"markus\"}"
-echo "should return HTTP 200 with generated token for the user, here: altenhof-mtcgToken"
-echo .
-curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"admin\",    \"Password\":\"istrator\"}"
-echo "should return HTTP 200 with generated token for the user, here: admin-mtcgToken"
-echo .
-
 # --------------------------------------------------
 echo "14) edit user data"
 echo .
@@ -51,6 +40,25 @@ echo "Should return HTTP 200 - and new user data"
 echo .
 echo .
 
+if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
+echo "should fail:"
+curl -i -X GET http://localhost:10001/users/altenhof --header "Authorization: Bearer kienboec-mtcgToken"
+echo "Should return HTTP 4xx"
+echo .
+curl -i -X GET http://localhost:10001/users/kienboec --header "Authorization: Bearer altenhof-mtcgToken"
+echo "Should return HTTP 4xx"
+echo .
+curl -i -X PUT http://localhost:10001/users/kienboec --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "{\"Name\": \"Hoax\",  \"Bio\": \"me playin...\", \"Image\": \":-)\"}"
+echo "Should return HTTP 4xx"
+echo .
+curl -i -X PUT http://localhost:10001/users/altenhof --header "Content-Type: application/json" --header "Authorization: Bearer kienboec-mtcgToken" -d "{\"Name\": \"Hoax\", \"Bio\": \"me codin...\",  \"Image\": \":-D\"}"
+echo "Should return HTTP 4xx"
+echo .
+curl -i -X GET http://localhost:10001/users/someGuy  --header "Authorization: Bearer kienboec-mtcgToken"
+echo "Should return HTTP 4xx"
+echo .
+echo .
 
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+

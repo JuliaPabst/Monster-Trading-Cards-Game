@@ -42,14 +42,19 @@ public abstract class Controller {
         }
     }
 
-    protected String getAuthorizationHeader(Request request) {
+    protected String getAuthorizationToken(Request request) {
         String authHeader = request.getHeader("Authorization");
-        authHeader = authHeader.toLowerCase();
         if (authHeader == null || authHeader.isEmpty()) {
             System.out.println("Authorization header: " + authHeader);
             throw new MissingAuthorizationHeader("Authorization header is missing");
         }
-        return authHeader;
+
+        String token = authHeader.split(" ")[1];
+        String name = token.split("-")[0];
+
+        System.out.println("Username: " + name);
+
+        return token;
     }
 
     protected Response json(Status status, Object object) {

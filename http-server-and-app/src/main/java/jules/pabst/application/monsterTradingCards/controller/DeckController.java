@@ -45,7 +45,7 @@ public class DeckController extends Controller {
 
     public Response getDeck(Request request) {
         try {
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             List<Card> cards = deckService.readDeck(authenticationToken);
             return json(Status.OK, cards);
         } catch (UserNotFound e) {
@@ -58,7 +58,7 @@ public class DeckController extends Controller {
 
     public Response configureDeck(Request request) {
         try{
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             List<String> cardIds =  arrayFromBody(request.getBody(), new TypeReference<List<String>>() {});
             List<Card> cards = deckService.configureDeck(authenticationToken, cardIds);
             return json(Status.OK, cards);

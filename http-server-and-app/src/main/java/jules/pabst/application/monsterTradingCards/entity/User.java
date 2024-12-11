@@ -15,6 +15,8 @@ public class User {
     private String token;
     private int credit;
 
+    public User(){}
+
     public User(String uuid, String username, String password) {
         this.username = username;
         this.password = password;

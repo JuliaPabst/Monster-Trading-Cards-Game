@@ -74,8 +74,7 @@ public class DeckService {
     }
 
     public User getUser(String authenticationToken) throws UserNotFound {
-        String token = authenticationToken.split(" ")[1];
-        String name = token.split("-")[0];
+        String name = authenticationToken.split("-")[0];
 
         System.out.println("Username: " + name);
 

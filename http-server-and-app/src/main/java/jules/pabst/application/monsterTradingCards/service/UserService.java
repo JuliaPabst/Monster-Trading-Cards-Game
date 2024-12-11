@@ -63,8 +63,7 @@ public class UserService {
     }
 
     public Optional<User> getUserByAuthenticationToken(String authenticationToken) {
-        String token = authenticationToken.split(" ")[1];
-        String name = token.split("-")[0];
+        String name = authenticationToken.split("-")[0];
 
         System.out.println("Username: " + name);
 
@@ -73,6 +72,8 @@ public class UserService {
 
     public UserDTO updateUserData(UserUpdateDTO user, String authenticationToken){
         Optional<User> originalUser = getUserByAuthenticationToken(authenticationToken);
+        System.out.println("Authentication Token: " + authenticationToken);
+        System.out.println("Original User: Token: " + originalUser.get().getToken());
         if(originalUser.isPresent()) {
         UserDTO userDTO = new UserDTO(
                 originalUser.get().getUuid(),

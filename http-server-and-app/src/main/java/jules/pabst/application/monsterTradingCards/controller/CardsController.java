@@ -5,6 +5,7 @@ import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
+import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.service.CardService;
 import jules.pabst.application.monsterTradingCards.service.PackageService;
@@ -42,7 +43,7 @@ public class CardsController extends Controller {
 
     public Response getByUserToken(Request request) {
         try {
-            String authenticationToken = getAuthorizationHeader(request);
+            String authenticationToken = getAuthorizationToken(request);
             Optional<User> user = userService.getUserByAuthenticationToken(authenticationToken);
             List<Card> cards = new ArrayList<>();
             if (user.isPresent()) {
@@ -52,9 +53,11 @@ public class CardsController extends Controller {
            return json(Status.OK, cards);
 
         } catch(MissingAuthorizationHeader e){
-            return json(Status.UNAUTHORIZED, new ErrorResponse("Missing authorization header"));
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
         } catch (UserNotFound | CardsNotFound e) {
-            return json(Status.NOT_FOUND, e);
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(NoPackagesOwned e){
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         }
     }
 }
