@@ -1,5 +1,6 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
+import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 
 import java.sql.ResultSet;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.NotEnoughCredit;
+import jules.pabst.application.monsterTradingCards.exception.UpdatingUserFailed;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +23,7 @@ public class UserDbRepository implements UserRepository {
     private final static String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
     private final static String UPDATE_CREDITS = "UPDATE users SET credit = ? WHERE username = ?";
+    private final static String UPDATE_USERDATA = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
     private final ConnectionPool connectionPool;
     public UserDbRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -93,6 +96,27 @@ public class UserDbRepository implements UserRepository {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    public UserDTO updateUserData(String originalUsername, UserDTO userDTO){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USERDATA)
+        ) {
+            System.out.println("Username UserDTO: %s".formatted(userDTO.getUsername()));
+            System.out.println("Username Original:" + originalUsername);
+            preparedStatement.setString(1, userDTO.getUsername());
+            preparedStatement.setString(2, userDTO.getBio());
+            preparedStatement.setString(3, userDTO.getImage());
+            preparedStatement.setString(4, originalUsername);
+
+            preparedStatement.execute();
+
+            return userDTO;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new  RuntimeException(e);
         }
     }
 }

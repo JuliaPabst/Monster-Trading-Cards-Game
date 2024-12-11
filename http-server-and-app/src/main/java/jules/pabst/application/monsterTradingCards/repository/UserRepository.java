@@ -1,5 +1,6 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
+import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface UserRepository {
     void updateCredits(User user);
 
     int readCurrentCredit(User user);
+
+    UserDTO updateUserData(String originalUsername, UserDTO userDTO);
 }

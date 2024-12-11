@@ -44,6 +44,7 @@ public abstract class Controller {
 
     protected String getAuthorizationHeader(Request request) {
         String authHeader = request.getHeader("Authorization");
+        authHeader = authHeader.toLowerCase();
         if (authHeader == null || authHeader.isEmpty()) {
             System.out.println("Authorization header: " + authHeader);
             throw new MissingAuthorizationHeader("Authorization header is missing");

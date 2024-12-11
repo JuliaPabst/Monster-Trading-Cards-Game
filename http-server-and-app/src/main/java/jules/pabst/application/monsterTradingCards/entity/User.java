@@ -35,6 +35,10 @@ public class User {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -74,5 +78,13 @@ public class User {
 
     public String getImage() {
         return image;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -13,10 +13,11 @@ public class UserDTO {
     private int elo = 0;
     private int wins = 0;
     private int losses = 0;
+    private String token = "";
     private int credit;
 
 
-    public UserDTO(String uuid, String username, String bio, String image, int elo, int wins, int losses, int credit) {
+    public UserDTO(String uuid, String username, String bio, String image, int elo, int wins, int losses, String token, int credit) {
         this.uuid = uuid;
         this.username = username;
         this.bio = bio;
@@ -24,6 +25,7 @@ public class UserDTO {
         this.elo = elo;
         this.wins = wins;
         this.losses = losses;
+        this.token = token;
         this.credit = credit;
     }
 
@@ -58,5 +60,17 @@ public class UserDTO {
 
     public int getLosses() {
         return losses;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

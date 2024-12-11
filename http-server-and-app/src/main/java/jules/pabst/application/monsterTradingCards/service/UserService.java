@@ -2,8 +2,10 @@ package jules.pabst.application.monsterTradingCards.service;
 
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
+import jules.pabst.application.monsterTradingCards.DTOs.UserUpdateDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
+import jules.pabst.application.monsterTradingCards.exception.UpdatingUserFailed;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
@@ -52,6 +54,7 @@ public class UserService {
                         user1.get().getElo(),
                         user1.get().getWins(),
                         user1.get().getLosses(),
+                        user1.get().getToken(),
                         user1.get().getCredit());
             }
             throw new InvalidUserCredentials("No access rights of this user's data");
@@ -66,5 +69,36 @@ public class UserService {
         System.out.println("Username: " + name);
 
         return userRepository.findUserByName(name);
+    }
+
+    public UserDTO updateUserData(UserUpdateDTO user, String authenticationToken){
+        Optional<User> originalUser = getUserByAuthenticationToken(authenticationToken);
+        if(originalUser.isPresent()) {
+        UserDTO userDTO = new UserDTO(
+                originalUser.get().getUuid(),
+                originalUser.get().getUsername(),
+                originalUser.get().getBio(),
+                originalUser.get().getImage(),
+                originalUser.get().getElo(),
+                originalUser.get().getWins(),
+                originalUser.get().getLosses(),
+                originalUser.get().getToken(),
+                originalUser.get().getCredit());
+
+        if (user.getName() != null) {
+            userDTO.setUsername(user.getName());
+        }
+
+        if (user.getBio() != null) {
+            userDTO.setBio(user.getBio());
+        }
+
+        if (user.getImage() != null) {
+            userDTO.setImage(user.getImage());
+        }
+        return userRepository.updateUserData(originalUser.get().getUsername(), userDTO);
+        }
+        throw new UserNotFound("User not found");
+
     }
 }
