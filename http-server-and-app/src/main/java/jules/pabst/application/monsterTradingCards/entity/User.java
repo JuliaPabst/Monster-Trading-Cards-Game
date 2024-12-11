@@ -17,11 +17,23 @@ public class User {
 
     public User(){}
 
-    public User(String uuid, String username, String password) {
+    public User(String username, String password){
+        this.username = username;
+        this.password = password;
+        this.credit = 20;
+    }
+
+    public User(String uuid, String username, String password, String bio, String image, int elo, int wins, int losses, String token, int credit) {
         this.username = username;
         this.password = password;
         this.uuid = uuid;
-        this.credit = 20;
+        this.bio = bio;
+        this.image = image;
+        this.elo = elo;
+        this.wins = wins;
+        this.losses = losses;
+        this.token = token;
+        this.credit = credit;
     }
 
 

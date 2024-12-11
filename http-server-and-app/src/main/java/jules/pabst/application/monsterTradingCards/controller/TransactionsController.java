@@ -32,16 +32,13 @@ public class TransactionsController extends Controller{
     public Response aquirePackage(Request request){
         try {
             String authenticationToken = getAuthorizationToken(request);
-            Optional<User> user = userService.getUserByAuthenticationToken(authenticationToken);
-            if(user.isPresent()){
-                AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(user.get());
-                if(aquirePackageDTO != null){
-                    return json(Status.CREATED, aquirePackageDTO);
-                }
-                return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("User does not have enough credit"));
-            }
+            User user = userService.getUserByAuthenticationToken(authenticationToken);
 
-            return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
+            AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(user);
+            if(aquirePackageDTO != null){
+                return json(Status.CREATED, aquirePackageDTO);
+            }
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("User does not have enough credit"));
         } catch(NotEnoughCredit e) {
             return json(Status.PAYMENT_REQUIRED, new ErrorResponse("Not enough credit to acquire a package"));
         } catch(NoPackagesOwned e) {
@@ -52,6 +49,8 @@ public class TransactionsController extends Controller{
             return json(Status.UNAUTHORIZED, new ErrorResponse("Missing authorization header"));
         } catch(CouldNotAquirePackage e){
             return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("Aquiring package failed"));
+        } catch(UserNotFound e){
+            return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
         }
     }
 }

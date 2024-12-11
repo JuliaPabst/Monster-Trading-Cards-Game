@@ -5,12 +5,10 @@ import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserUpdateDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
-import jules.pabst.application.monsterTradingCards.exception.UpdatingUserFailed;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,66 +38,76 @@ public class UserService {
         return new UserCreationDTO(createdUser.getUsername(), createdUser.getToken());
     }
 
-    public UserDTO getUserByName(String name, String authenticationToken) {
-        Optional <User> user1 = getUserByAuthenticationToken(authenticationToken);
-        Optional<User> user2 = userRepository.findUserByName(name);
-        if (user1.isPresent() && user2.isPresent()) {
+    public UserDTO getUserByPathName(String pathName, String authenticationToken) {
+        if (authenticationToken.contains(pathName)) {
+            Optional<User> user = userRepository.findUserByAuthenticationToken(authenticationToken);
 
-            if(user1.get().getUuid().equals(user2.get().getUuid())){
+            if (user.isPresent()) {
                 return new UserDTO(
-                        user1.get().getUuid(),
-                        user1.get().getUsername(),
-                        user1.get().getBio(),
-                        user1.get().getImage(),
-                        user1.get().getElo(),
-                        user1.get().getWins(),
-                        user1.get().getLosses(),
-                        user1.get().getToken(),
-                        user1.get().getCredit());
+                        user.get().getUuid(),
+                        user.get().getUsername(),
+                        user.get().getBio(),
+                        user.get().getImage(),
+                        user.get().getElo(),
+                        user.get().getWins(),
+                        user.get().getLosses(),
+                        user.get().getToken(),
+                        user.get().getCredit());
             }
-            throw new InvalidUserCredentials("No access rights of this user's data");
+            throw new UserNotFound("User not found");
+        }
+        throw new InvalidUserCredentials("No access rights of this user's data");
+    }
+
+    public User getUserByAuthenticationToken (String authenticationToken){
+        if (authenticationToken == null) {
+            throw new IllegalArgumentException("Authentication token cannot be null");
+        }
+
+        Optional<User> originalUser = userRepository.findUserByAuthenticationToken(authenticationToken);
+
+        if (originalUser.isPresent()) {
+            return originalUser.get();
         }
         throw new UserNotFound("User not found");
     }
 
-    public Optional<User> getUserByAuthenticationToken(String authenticationToken) {
-        String name = authenticationToken.split("-")[0];
+    public UserDTO updateUserData (UserUpdateDTO user, String authenticationToken, String pathName) {
+        if (authenticationToken.contains(pathName)) {
+            Optional<User> originalUser = userRepository.findUserByAuthenticationToken(authenticationToken);
+            if (originalUser.isPresent()) {
+                System.out.println("Authentication Token: " + authenticationToken);
+                System.out.println("Original User: Token: " + originalUser.get().getToken());
 
-        System.out.println("Username: " + name);
+                System.out.println("Authentication token equal to each other");
+                UserDTO userDTO = new UserDTO(
+                        originalUser.get().getUuid(),
+                        originalUser.get().getUsername(),
+                        originalUser.get().getBio(),
+                        originalUser.get().getImage(),
+                        originalUser.get().getElo(),
+                        originalUser.get().getWins(),
+                        originalUser.get().getLosses(),
+                        originalUser.get().getToken(),
+                        originalUser.get().getCredit());
 
-        return userRepository.findUserByName(name);
-    }
+                if (user.getUsername() != null) {
+                    userDTO.setUsername(user.getUsername());
+                }
 
-    public UserDTO updateUserData(UserUpdateDTO user, String authenticationToken){
-        Optional<User> originalUser = getUserByAuthenticationToken(authenticationToken);
-        System.out.println("Authentication Token: " + authenticationToken);
-        System.out.println("Original User: Token: " + originalUser.get().getToken());
-        if(originalUser.isPresent()) {
-        UserDTO userDTO = new UserDTO(
-                originalUser.get().getUuid(),
-                originalUser.get().getUsername(),
-                originalUser.get().getBio(),
-                originalUser.get().getImage(),
-                originalUser.get().getElo(),
-                originalUser.get().getWins(),
-                originalUser.get().getLosses(),
-                originalUser.get().getToken(),
-                originalUser.get().getCredit());
+                if (user.getBio() != null) {
+                    userDTO.setBio(user.getBio());
+                }
 
-        if (user.getName() != null) {
-            userDTO.setUsername(user.getName());
+                if (user.getImage() != null) {
+                    userDTO.setImage(user.getImage());
+                }
+
+                return userRepository.updateUserData(originalUser.get().getUsername(), userDTO);
+
+            }
+            throw new UserNotFound("User not found");
         }
-
-        if (user.getBio() != null) {
-            userDTO.setBio(user.getBio());
-        }
-
-        if (user.getImage() != null) {
-            userDTO.setImage(user.getImage());
-        }
-        return userRepository.updateUserData(originalUser.get().getUsername(), userDTO);
-        }
-        throw new UserNotFound("User not found");
-
+        throw new InvalidUserCredentials("No access rights of this user's data");
     }
 }

@@ -11,6 +11,8 @@ public interface UserRepository {
     User save(User user);
 
     Optional<User> findUserByName(String name);
+    //Continue here
+    Optional<User>findUserByAuthenticationToken(String authenticationToken);
 
     void updateCredits(User user);
 

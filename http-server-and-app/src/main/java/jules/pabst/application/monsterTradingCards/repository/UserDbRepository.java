@@ -21,6 +21,7 @@ public class UserDbRepository implements UserRepository {
     private final static String NEW_USER
             = "INSERT INTO users (uuid, username, password, credit) VALUES (?, ?, ?, ?)";
     private final static String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
+    private final static String FIND_USER_BY_TOKEN = "SELECT * FROM users WHERE token = ?";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
     private final static String UPDATE_CREDITS = "UPDATE users SET credit = ? WHERE username = ?";
     private final static String UPDATE_USERDATA = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
@@ -53,10 +54,34 @@ public class UserDbRepository implements UserRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_USERNAME)
         ) {
+            System.out.println("name in findUserByName:'%s'".formatted(name));
             preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password")));
+                System.out.println("Result set token finduserByName: " + resultSet.getString("token"));
+                System.out.println("Result set username finduserByName: " + resultSet.getString("username"));
+                return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<User>findUserByAuthenticationToken(String authenticationToken){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_TOKEN)
+        ) {
+            System.out.println("authenticationtoken in findUserByAuthentication:'%s'".formatted(authenticationToken));
+            preparedStatement.setString(1, authenticationToken);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                System.out.println("Result set token findUserByAuthentication: " + resultSet.getString("token"));
+                System.out.println("Result set username findUserByAuthentication: " + resultSet.getString("username"));
+                return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit")));
             }
         } catch (SQLException e) {
             e.printStackTrace();

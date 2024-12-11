@@ -49,16 +49,9 @@ public class UsersController extends Controller {
 
     private Response readUserByName(Request request) {
         try {
-            String[] pathParts = request.getPath().split("/");
-            String name = "";
-            if(pathParts.length < 3) {
-                name = pathParts[1];
-            } else {
-                name = pathParts[2];
-            }
-
+            String pathName = extractNameFromPath(request);
             String authenticationToken = getAuthorizationToken(request);
-            UserDTO user2 = userService.getUserByName(name, authenticationToken);
+            UserDTO user2 = userService.getUserByPathName(pathName, authenticationToken);
             return json(Status.OK, user2);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
@@ -69,9 +62,10 @@ public class UsersController extends Controller {
 
     private Response putUserData(Request request) {
         try{
+            String pathName = extractNameFromPath(request);
             String authenticationToken = getAuthorizationToken(request);
             UserUpdateDTO user = fromBody(request.getBody(), UserUpdateDTO.class);
-            UserDTO userDTO = userService.updateUserData(user, authenticationToken);
+            UserDTO userDTO = userService.updateUserData(user, authenticationToken, pathName);
             return json(Status.OK, userDTO);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
@@ -81,5 +75,16 @@ public class UsersController extends Controller {
             return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
 
+    }
+
+    private String extractNameFromPath(Request request){
+        String[] pathParts = request.getPath().split("/");
+        String pathName = "";
+        if(pathParts.length < 3) {
+            pathName = pathParts[1];
+        } else {
+            pathName = pathParts[2];
+        }
+        return pathName;
     }
 }

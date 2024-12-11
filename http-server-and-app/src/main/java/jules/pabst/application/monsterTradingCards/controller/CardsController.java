@@ -44,11 +44,11 @@ public class CardsController extends Controller {
     public Response getByUserToken(Request request) {
         try {
             String authenticationToken = getAuthorizationToken(request);
-            Optional<User> user = userService.getUserByAuthenticationToken(authenticationToken);
+            User user = userService.getUserByAuthenticationToken(authenticationToken);
             List<Card> cards = new ArrayList<>();
-            if (user.isPresent()) {
-                cards = cardsService.readByUserToken(user.get());
-            }
+
+            cards = cardsService.readByUserToken(user);
+
 
            return json(Status.OK, cards);
 
