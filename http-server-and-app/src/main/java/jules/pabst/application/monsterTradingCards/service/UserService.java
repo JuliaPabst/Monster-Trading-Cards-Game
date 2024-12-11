@@ -3,6 +3,7 @@ package jules.pabst.application.monsterTradingCards.service;
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
@@ -37,19 +38,23 @@ public class UserService {
         return new UserCreationDTO(createdUser.getUsername(), createdUser.getToken());
     }
 
-    public UserDTO getUserByName(String name) {
-        Optional<User> user = userRepository.findUserByName(name);
-        if (user.isPresent()) {
-            UserDTO userDTO = new UserDTO(
-                    user.get().getUuid(),
-                    user.get().getUsername(),
-                    user.get().getBio(),
-                    user.get().getImage(),
-                    user.get().getElo(),
-                    user.get().getWins(),
-                    user.get().getLosses(),
-                    user.get().getCredit());
-            return userDTO;
+    public UserDTO getUserByName(String name, String authenticationToken) {
+        Optional <User> user1 = getUserByAuthenticationToken(authenticationToken);
+        Optional<User> user2 = userRepository.findUserByName(name);
+        if (user1.isPresent() && user2.isPresent()) {
+
+            if(user1.get().getUuid().equals(user2.get().getUuid())){
+                return new UserDTO(
+                        user1.get().getUuid(),
+                        user1.get().getUsername(),
+                        user1.get().getBio(),
+                        user1.get().getImage(),
+                        user1.get().getElo(),
+                        user1.get().getWins(),
+                        user1.get().getLosses(),
+                        user1.get().getCredit());
+            }
+            throw new InvalidUserCredentials("No access rights of this user's data");
         }
         throw new UserNotFound("User not found");
     }

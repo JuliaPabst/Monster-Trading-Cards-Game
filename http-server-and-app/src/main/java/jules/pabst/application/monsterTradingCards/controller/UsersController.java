@@ -1,9 +1,13 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
+import jules.pabst.application.monsterTradingCards.DTOs.LoginTokenDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
+import jules.pabst.application.monsterTradingCards.entity.TokenRequest;
 import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
+import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.service.UserService;
@@ -26,6 +30,8 @@ public class UsersController extends Controller {
     public Response handle(Request request) {
         if (request.getMethod().equals(Method.POST)) {
             return create(request);
+        } else if(request.getMethod().equals(Method.PUT)) {
+            return updateUserData(request);
         } else if (request.getMethod().equals(Method.GET)) {
             return readUserByName(request);
         }
@@ -53,12 +59,18 @@ public class UsersController extends Controller {
                 name = pathParts[2];
             }
 
-            UserDTO user = userService.getUserByName(name);
-
-            return json(Status.OK, user);
+            // To do: create Util function and reuse it here
+            String authenticationToken = getAuthorizationHeader(request);
+            UserDTO user2 = userService.getUserByName(name, authenticationToken);
+            return json(Status.OK, user2);
         } catch(UserNotFound e){
-            return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(MissingAuthorizationHeader | InvalidUserCredentials e){
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
         }
+    }
+
+    private Response updateUserData(Request request) {
 
     }
 }

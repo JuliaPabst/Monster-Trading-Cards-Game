@@ -53,9 +53,7 @@ public class CardsController extends Controller {
 
         } catch(MissingAuthorizationHeader e){
             return json(Status.UNAUTHORIZED, new ErrorResponse("Missing authorization header"));
-        } catch (UserNotFound e) {
-            return json(Status.NOT_FOUND, e);
-        } catch (CardsNotFound e) {
+        } catch (UserNotFound | CardsNotFound e) {
             return json(Status.NOT_FOUND, e);
         }
     }
