@@ -35,6 +35,7 @@ public class HttpResponseFormatter {
 
         responseBuilder.append("\r\n");
         responseBuilder.append(response.getBody());
+        responseBuilder.append("\r\n");
 
         return responseBuilder.toString();
     }
