@@ -3,6 +3,7 @@ package jules.pabst.application.monsterTradingCards.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
+import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.service.CardService;
 import jules.pabst.application.monsterTradingCards.service.PackageService;
@@ -33,25 +34,17 @@ public class PackageController extends Controller {
     }
 
     public Response create(Request request){
-        String authToken = getAuthorizationToken(request);
-        List<Card> cards = arrayFromBody(request.getBody(), new TypeReference<List<Card>>() {});
-
-        String packageId = UUID.randomUUID().toString();
         try{
-            if(authToken.equals("admin-mtcgToken")){
-                packageId = packageService.create(packageId);
-                String finalPackageId = packageId;
-                System.out.println("Number of cards:" + cards.size());
-                cards.forEach(card -> {
-                    card.setPackageId(finalPackageId);
-                    card = cardService.create(card);
-                });
+            String authToken = getAuthorizationToken(request);
+            List<Card> cards = arrayFromBody(request.getBody(), new TypeReference<List<Card>>() {});
 
-                return json(Status.CREATED, cards);
-            }
-            throw new InvalidUserCredentials("Not authorized");
+            cards = packageService.createPackage(authToken, cards);
+
+            return json(Status.CREATED, cards);
+        } catch (NotAuthorized e){
+            return json(Status.UNAUTHORIZED, e.getMessage());
         } catch(Exception e){
-            return json(Status.BAD_REQUEST, e.getMessage());
+            return json(Status.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
     }

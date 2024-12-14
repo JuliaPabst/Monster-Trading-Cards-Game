@@ -89,6 +89,7 @@ public class UserDbRepository implements UserRepository {
         return Optional.empty();
     }
 
+    @Override
     public Optional<User>findUserByAuthenticationToken(String authenticationToken){
         try (
                 Connection connection = connectionPool.getConnection();
@@ -110,7 +111,7 @@ public class UserDbRepository implements UserRepository {
         return Optional.empty();
     }
 
-
+    @Override
     public int readCurrentCredit(User user) {
         try (
                 Connection connection = connectionPool.getConnection();
@@ -128,6 +129,7 @@ public class UserDbRepository implements UserRepository {
         }
     }
 
+    @Override
     public void updateUserByUuid(User user){
         try (
                 Connection connection = connectionPool.getConnection();
@@ -151,6 +153,7 @@ public class UserDbRepository implements UserRepository {
         }
     }
 
+    @Override
     public UserDTO updateUserDataByUserName(String originalUsername, UserDTO userDTO){
         try (
                 Connection connection = connectionPool.getConnection();

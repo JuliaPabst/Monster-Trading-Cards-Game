@@ -45,6 +45,7 @@ public class PackageDbRepository implements PackageRepository {
         }
     }
 
+    @Override
     public String findPackageWithoutOwner(){
         try (
                 Connection connection = connectionPool.getConnection();
@@ -70,23 +71,7 @@ public class PackageDbRepository implements PackageRepository {
         }
     }
 
-    public AquirePackageDTO updatePackage(String packageId, User user){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PACKAGE)
-        ) {
-            System.out.println("Updating package with ID: " + packageId);
-            System.out.println("Setting owner to: " + user.getUuid());
-            preparedStatement.setString(1, user.getUuid());
-            preparedStatement.setString(2, packageId);
-            preparedStatement.execute();
-            return new AquirePackageDTO(packageId, user.getUuid());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
+    @Override
     public List<CardPackage> findPackagesByOwner(User user){
         try (
                 Connection connection = connectionPool.getConnection();
@@ -108,6 +93,24 @@ public class PackageDbRepository implements PackageRepository {
             }
 
             throw(new NoPackagesOwned("This user does not own any packages"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public AquirePackageDTO updatePackage(String packageId, User user){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_PACKAGE)
+        ) {
+            System.out.println("Updating package with ID: " + packageId);
+            System.out.println("Setting owner to: " + user.getUuid());
+            preparedStatement.setString(1, user.getUuid());
+            preparedStatement.setString(2, packageId);
+            preparedStatement.execute();
+            return new AquirePackageDTO(packageId, user.getUuid());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

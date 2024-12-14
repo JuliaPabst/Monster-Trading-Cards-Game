@@ -6,11 +6,11 @@ import jules.pabst.application.monsterTradingCards.entity.User;
 import java.util.List;
 
 public interface PackageRepository {
-    public String save(String packageId);
+    String save(String packageId);
 
-    public AquirePackageDTO updatePackage(String packageId, User user);
+    String findPackageWithoutOwner();
 
-    public String findPackageWithoutOwner();
+    List<CardPackage> findPackagesByOwner(User user);
 
-    public List<CardPackage> findPackagesByOwner(User user);
+    AquirePackageDTO updatePackage(String packageId, User user);
 }

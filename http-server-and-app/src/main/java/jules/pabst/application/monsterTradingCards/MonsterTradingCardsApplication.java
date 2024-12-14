@@ -50,9 +50,9 @@ public class MonsterTradingCardsApplication implements Application {
         UserRepository userRepository = new UserDbRepository(connectionPool);
         UserService userService = new UserService(userRepository);
         PackageRepository packageRepository = new PackageDbRepository(connectionPool);
-        PackageService packageService = new PackageService(packageRepository, userRepository);
         CardDbRepository cardRepository = new CardDbRepository(connectionPool);
         CardService cardService = new CardService(cardRepository, packageRepository);
+        PackageService packageService = new PackageService(packageRepository, userRepository, cardService);
         DeckService deckService = new DeckService(cardRepository, userRepository, packageRepository);
         StatsService statsService = new StatsService(userRepository);
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);

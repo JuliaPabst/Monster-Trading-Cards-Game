@@ -4,6 +4,7 @@ import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.AllPackagesOwned;
+import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
 import jules.pabst.application.monsterTradingCards.exception.NotEnoughCredit;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
@@ -17,18 +18,29 @@ public class PackageService {
 
     private final PackageRepository packageRepository;
     private final UserRepository userRepository;
+    private final CardService cardService;
 
-    public PackageService(PackageRepository packageRepository, UserRepository userRepository) {
+    public PackageService(PackageRepository packageRepository, UserRepository userRepository, CardService cardService) {
        this.packageRepository = packageRepository;
        this.userRepository = userRepository;
+       this.cardService = cardService;
     }
 
-    public String create(String packageId) {
-        if (packageId == null) {
-            throw new IllegalArgumentException("Package Id cannot be null");
+    public List<Card> createPackage(String authToken, List<Card> cards) {
+        if(authToken.equals("admin-mtcgToken")){
+            String packageId = UUID.randomUUID().toString();
+
+            packageRepository.save(packageId);
+
+            cards.forEach(card -> {
+                card.setPackageId(packageId);
+                cardService.create(card);
+            });
+
+            return cards;
         }
 
-        return packageRepository.save(packageId);
+        throw new NotAuthorized("Only admins can create packages");
     }
 
     public AquirePackageDTO checkCreditAndAquire(User user){
