@@ -29,7 +29,7 @@ public class PackageController extends Controller {
             return create(request);
         }
 
-        return json(Status.OK, null);
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     public Response create(Request request){

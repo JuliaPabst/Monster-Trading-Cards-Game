@@ -24,7 +24,7 @@ public class SessionController extends Controller{
         if (request.getMethod().equals(Method.POST)) {
             return authenticate(request);
         }
-        return null;
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     private Response authenticate(Request request){

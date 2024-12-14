@@ -22,7 +22,7 @@ public class StatsController extends Controller {
             return getStats(request);
         }
 
-        return null;
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     private Response getStats(Request request) {

@@ -26,7 +26,8 @@ public class TransactionsController extends Controller{
         if(request.getMethod().equals(Method.POST)){
             return aquirePackage(request);
         }
-        return json(Status.INTERNAL_SERVER_ERROR,  new ErrorResponse("Internal Server Error"));
+
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     public Response aquirePackage(Request request){

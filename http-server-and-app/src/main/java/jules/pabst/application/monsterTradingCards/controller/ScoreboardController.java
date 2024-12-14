@@ -24,7 +24,7 @@ public class ScoreboardController extends Controller {
             return getUserData(request);
         }
 
-        return json(Status.INTERNAL_SERVER_ERROR, "Internal Server Error");
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     public Response getUserData(Request request) {

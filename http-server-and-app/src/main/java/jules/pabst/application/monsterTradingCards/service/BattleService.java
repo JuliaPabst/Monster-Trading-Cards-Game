@@ -10,16 +10,19 @@ import java.util.List;
 import java.util.Random;
 
 public class BattleService {
-
     private final UserRepository userRepository;
     private final CardRepository cardRepository;
+    private final UserService userService;
 
-    public BattleService(UserRepository userRepository, CardRepository cardRepository) {
+    public BattleService(UserRepository userRepository, CardRepository cardRepository, UserService userService) {
         this.userRepository = userRepository;
         this.cardRepository = cardRepository;
+        this.userService = userService;
     }
 
-    public String battle(User player1, User player2) {
+    public String battle(String player1AuthenticationToken, String player2AuthenticationToken) {
+        User player1 = userService.getUserByAuthenticationToken(player1AuthenticationToken);
+        User player2 = userService.getUserByAuthenticationToken(player2AuthenticationToken);
         List<Card> deck1 = cardRepository.findCardsByDeck(player1);
         List<Card> deck2 = cardRepository.findCardsByDeck(player2);
 
@@ -44,7 +47,7 @@ public class BattleService {
                     .append(" (Damage: ").append(card2.getDamage()).append(")\n");
 
             // Resolve special rules
-            if (specialRules(card1, card2, battleLog)) {
+            if (specialRules(card1, card2, battleLog) || specialRules(card2, card1, battleLog)) {
                 continue;
             }
 
@@ -132,8 +135,12 @@ public class BattleService {
         int eloChange = 30;
         winner.setElo(winner.getElo() + eloChange);
         loser.setElo(loser.getElo() - eloChange);
-        userRepository.updateCredits(winner); // Assuming ELO update is done via credits
-        userRepository.updateCredits(loser);
+
+        winner.setWins(winner.getWins() + 1);
+        loser.setLosses(loser.getLosses() + 1);
+
+        userRepository.updateUserByUuid(winner);
+        userRepository.updateUserByUuid(loser);
 
         log.append(winner.getUsername()).append(" gains ").append(eloChange).append(" ELO points!\n");
         log.append(loser.getUsername()).append(" loses ").append(eloChange).append(" ELO points.\n");

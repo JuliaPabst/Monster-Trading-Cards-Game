@@ -38,7 +38,7 @@ public class CardsController extends Controller {
             return getByUserToken(request);
         }
 
-        return null;
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     public Response getByUserToken(Request request) {

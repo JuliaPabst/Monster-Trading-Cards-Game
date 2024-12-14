@@ -34,7 +34,7 @@ public class UsersController extends Controller {
             return readUserByName(request);
         }
 
-        return json(Status.INTERNAL_SERVER_ERROR,  new ErrorResponse("Internal Server Error"));
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     private Response create(Request request) {

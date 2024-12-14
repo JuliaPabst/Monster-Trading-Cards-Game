@@ -40,7 +40,7 @@ public class DeckController extends Controller {
         } else if(request.getMethod().equals(Method.PUT)){
             return configureDeck(request);
         }
-        return null;
+        return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
     public Response getDeck(Request request) {
