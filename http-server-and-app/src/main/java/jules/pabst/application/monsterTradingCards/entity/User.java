@@ -69,13 +69,16 @@ public class User {
         this.token = token;
     }
 
-
     public String getBio() {
         return bio;
     }
 
     public int getElo() {
         return elo;
+    }
+
+    public void setElo(int elo) {
+        this.elo = elo;
     }
 
     public int getWins() {
