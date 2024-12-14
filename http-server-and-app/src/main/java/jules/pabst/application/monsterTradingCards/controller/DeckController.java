@@ -34,12 +34,12 @@ public class DeckController extends Controller {
 
     @Override
     public Response handle(Request request) {
-
         if(request.getMethod().equals(Method.GET)){
             return getDeck(request);
         } else if(request.getMethod().equals(Method.PUT)){
             return configureDeck(request);
         }
+        
         return json(Status.NOT_FOUND, "Endpoint not found");
     }
 

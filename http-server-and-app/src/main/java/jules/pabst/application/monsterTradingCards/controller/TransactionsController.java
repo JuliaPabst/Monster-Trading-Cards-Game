@@ -32,26 +32,19 @@ public class TransactionsController extends Controller{
 
     public Response aquirePackage(Request request){
         try {
-            String authenticationToken = getAuthorizationToken(request);
-            User user = userService.getUserByAuthenticationToken(authenticationToken);
-
-            AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(user);
-            if(aquirePackageDTO != null){
-                return json(Status.CREATED, aquirePackageDTO);
-            }
-            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("User does not have enough credit"));
-        } catch(NotEnoughCredit e) {
-            return json(Status.PAYMENT_REQUIRED, new ErrorResponse("Not enough credit to acquire a package"));
-        } catch(NoPackagesOwned e) {
-            return json(Status.BAD_REQUEST, new ErrorResponse("No packages owned"));
-        } catch(AllPackagesOwned e) {
-            return json(Status.CONFLICT, new ErrorResponse("No packages available"));
+            String authToken = getAuthorizationToken(request);
+            AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(authToken);
+            return json(Status.CREATED, aquirePackageDTO);
         } catch(MissingAuthorizationHeader e){
-            return json(Status.UNAUTHORIZED, new ErrorResponse("Missing authorization header"));
-        } catch(CouldNotAquirePackage e){
-            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse("Aquiring package failed"));
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
         } catch(UserNotFound e){
-            return json(Status.NOT_FOUND, new ErrorResponse("User not found"));
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(NotEnoughCredit e) {
+            return json(Status.PAYMENT_REQUIRED, new ErrorResponse(e.getMessage()));
+        } catch(AllPackagesOwned e) {
+            return json(Status.CONFLICT, new ErrorResponse(e.getMessage()));
+        } catch (Exception e){
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
     }
 }

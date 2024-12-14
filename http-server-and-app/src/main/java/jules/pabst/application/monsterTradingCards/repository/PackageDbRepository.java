@@ -51,7 +51,7 @@ public class PackageDbRepository implements PackageRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_WITHOUT_OWNER)
         ) {
-           List<CardPackage> packages = new ArrayList<>();
+            List<CardPackage> packages = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 System.out.println("id: %s".formatted(resultSet.getString("id")));
@@ -60,7 +60,6 @@ public class PackageDbRepository implements PackageRepository {
             }
 
             if (!packages.isEmpty()) {
-                System.out.println("-----------------");
                 return packages.get(0).getId();
             }
 

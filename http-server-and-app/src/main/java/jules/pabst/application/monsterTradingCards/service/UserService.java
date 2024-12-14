@@ -5,6 +5,7 @@ import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserUpdateDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
+import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
 import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
@@ -61,7 +62,7 @@ public class UserService {
 
     public User getUserByAuthenticationToken (String authenticationToken){
         if (authenticationToken == null) {
-            throw new IllegalArgumentException("Authentication token cannot be null");
+            throw new MissingAuthorizationHeader("Authentication token cannot be null");
         }
 
         Optional<User> originalUser = userRepository.findUserByAuthenticationToken(authenticationToken);

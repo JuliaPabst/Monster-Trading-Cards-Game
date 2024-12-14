@@ -52,7 +52,7 @@ public class MonsterTradingCardsApplication implements Application {
         PackageRepository packageRepository = new PackageDbRepository(connectionPool);
         CardDbRepository cardRepository = new CardDbRepository(connectionPool);
         CardService cardService = new CardService(cardRepository, packageRepository);
-        PackageService packageService = new PackageService(packageRepository, userRepository, cardService);
+        PackageService packageService = new PackageService(packageRepository, userRepository, cardService, userService);
         DeckService deckService = new DeckService(cardRepository, userRepository, packageRepository);
         StatsService statsService = new StatsService(userRepository);
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);

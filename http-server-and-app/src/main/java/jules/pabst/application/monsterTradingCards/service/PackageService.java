@@ -19,11 +19,13 @@ public class PackageService {
     private final PackageRepository packageRepository;
     private final UserRepository userRepository;
     private final CardService cardService;
+    private final UserService userService;
 
-    public PackageService(PackageRepository packageRepository, UserRepository userRepository, CardService cardService) {
+    public PackageService(PackageRepository packageRepository, UserRepository userRepository, CardService cardService, UserService userService) {
        this.packageRepository = packageRepository;
        this.userRepository = userRepository;
        this.cardService = cardService;
+        this.userService = userService;
     }
 
     public List<Card> createPackage(String authToken, List<Card> cards) {
@@ -43,16 +45,13 @@ public class PackageService {
         throw new NotAuthorized("Only admins can create packages");
     }
 
-    public AquirePackageDTO checkCreditAndAquire(User user){
-        user.setCredit(userRepository.readCurrentCredit(user));
-        System.out.println("User credit from db: " + userRepository.readCurrentCredit(user));
+    public AquirePackageDTO checkCreditAndAquire(String authtoken){
+        User user = userService.getUserByAuthenticationToken(authtoken);
         System.out.println("User credit: %d".formatted(user.getCredit()));
         if(user.getCredit()>=5){
             String packageIdWithoutOwner = packageRepository.findPackageWithoutOwner();
 
-            if(packageIdWithoutOwner.isEmpty()){
-                throw(new AllPackagesOwned("All packages already owned"));
-            }
+            user.setCredit(user.getCredit()-5);
 
             userRepository.updateUserByUuid(user);
 
