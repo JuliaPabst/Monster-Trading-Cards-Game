@@ -4,6 +4,7 @@ import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.entity.User;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class UserDbRepository implements UserRepository {
     private final static String NEW_USER
             = "INSERT INTO users (uuid, username, password, credit) VALUES (?, ?, ?, ?)";
+    private final static String FIND_ALL_USERS = "SELECT * FROM users";
     private final static String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final static String FIND_USER_BY_TOKEN = "SELECT * FROM users WHERE token = ?";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
@@ -49,6 +51,27 @@ public class UserDbRepository implements UserRepository {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<User> findAllUsers() {
+        List<User> users = new ArrayList<>();
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_USERS)
+        ) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                User newUser = new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit"));
+                users.add(newUser);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        return users;
+    }
+
     @Override
     public Optional<User> findUserByName(String name) {
         try (

@@ -10,6 +10,7 @@ public interface UserRepository {
 
     User save(User user);
 
+    List<User> findAllUsers();
     Optional<User> findUserByName(String name);
     //Continue here
     Optional<User>findUserByAuthenticationToken(String authenticationToken);
