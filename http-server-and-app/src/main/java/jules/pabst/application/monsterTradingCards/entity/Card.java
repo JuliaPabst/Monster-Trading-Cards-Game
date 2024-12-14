@@ -15,7 +15,7 @@ public class Card {
 
 
     public Card() {
-        this.name = CardType.valueOf("test");
+        this.name = CardType.WaterSpell;
     }
 
     public Card(@JsonProperty("Id") String id,
