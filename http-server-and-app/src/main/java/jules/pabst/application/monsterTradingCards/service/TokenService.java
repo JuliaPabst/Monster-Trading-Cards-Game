@@ -15,12 +15,15 @@ public class TokenService {
     }
 
     public LoginTokenDTO authenticate(TokenRequest tokenRequest){
-        Optional<User> user = this.userRepository.findUserByName(tokenRequest.getUsername());
+        Optional<User> userOptional = this.userRepository.findUserByName(tokenRequest.getUsername());
 
-        if (user.isPresent() && user.get().getPassword().equals(tokenRequest.getPassword())) {
+        if (userOptional.isPresent() && userOptional.get().getPassword().equals(tokenRequest.getPassword())) {
             String token ="%s-mtcgToken".formatted(tokenRequest.getUsername());
             tokenRequest.setToken(token);
-            this.userRepository.updateToken(user.get(), token);
+            User user = userOptional.get();
+            user.setToken(token);
+
+            this.userRepository.updateUserByUuid(user);
             return new LoginTokenDTO(tokenRequest.getUsername(), tokenRequest.getToken());
         }
 

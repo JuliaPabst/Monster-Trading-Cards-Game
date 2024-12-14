@@ -42,7 +42,7 @@ public class PackageService {
                 throw(new AllPackagesOwned("All packages already owned"));
             }
 
-            userRepository.updateCredits(user);
+            userRepository.updateUserByUuid(user);
 
             return packageRepository.updatePackage(packageIdWithoutOwner, user);
         }

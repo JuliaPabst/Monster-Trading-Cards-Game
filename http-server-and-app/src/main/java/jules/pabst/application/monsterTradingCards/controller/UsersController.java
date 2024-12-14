@@ -44,6 +44,8 @@ public class UsersController extends Controller {
             return json(Status.CREATED, userCreationDTO);
         } catch (UserAlreadyExists e) {
             return json(Status.CONFLICT, new ErrorResponse("User already exists"));
+        } catch (Exception e) {
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -57,6 +59,8 @@ public class UsersController extends Controller {
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(MissingAuthorizationHeader | InvalidUserCredentials e){
             return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -65,7 +69,7 @@ public class UsersController extends Controller {
             String pathName = extractNameFromPath(request);
             String authenticationToken = getAuthorizationToken(request);
             UserUpdateDTO user = fromBody(request.getBody(), UserUpdateDTO.class);
-            UserDTO userDTO = userService.updateUserData(user, authenticationToken, pathName);
+            UserDTO userDTO = userService.updateUserDataByUserName(user, authenticationToken, pathName);
             return json(Status.OK, userDTO);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
@@ -73,8 +77,9 @@ public class UsersController extends Controller {
             return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
         } catch(UpdatingUserFailed e){
             return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
+        }  catch (Exception e) {
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
-
     }
 
     private String extractNameFromPath(Request request){

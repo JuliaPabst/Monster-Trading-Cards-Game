@@ -8,15 +8,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
-import jules.pabst.application.monsterTradingCards.entity.User;
-import jules.pabst.application.monsterTradingCards.exception.NotEnoughCredit;
-import jules.pabst.application.monsterTradingCards.exception.UpdatingUserFailed;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 public class UserDbRepository implements UserRepository {
     private final static String NEW_USER
@@ -26,9 +22,7 @@ public class UserDbRepository implements UserRepository {
     private final static String FIND_USER_BY_TOKEN = "SELECT * FROM users WHERE token = ?";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
     private final static String UPDATE_USER_BY_UUID = "UPDATE users SET username = ?, password = ?, bio = ?, image = ?, elo = ?, wins = ?, losses = ?, token = ?, credit = ? WHERE uuid = ?";
-    private final static String UPDATE_TOKEN = "UPDATE users SET token = ? WHERE uuid = ?";
-    private final static String UPDATE_CREDITS = "UPDATE users SET credit = ? WHERE username = ?";
-    private final static String UPDATE_USERDATA = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
+    private final static String UPDATE_USERDATA_BY_USERNAME = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
     private final ConnectionPool connectionPool;
     public UserDbRepository(ConnectionPool connectionPool) {
         this.connectionPool = connectionPool;
@@ -116,25 +110,6 @@ public class UserDbRepository implements UserRepository {
         return Optional.empty();
     }
 
-    public void updateToken(User user, String token){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_TOKEN)
-        ) {
-            int newCredit = user.getCredit() - 5;
-            System.out.println("Uuid: %s".formatted(user.getUuid()));
-            preparedStatement.setString(1, token);
-            preparedStatement.setString(2, user.getUuid());
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    void updateUser(User user){
-
-    }
 
     public int readCurrentCredit(User user) {
         try (
@@ -153,44 +128,7 @@ public class UserDbRepository implements UserRepository {
         }
     }
 
-    public void updateCredits(User user){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CREDITS)
-        ) {
-            int newCredit = user.getCredit() - 5;
-            System.out.println("Username: %s".formatted(user.getUsername()));
-            preparedStatement.setInt(1, newCredit);
-            preparedStatement.setString(2, user.getUsername());
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    public UserDTO updateUserData(String originalUsername, UserDTO userDTO){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USERDATA)
-        ) {
-            System.out.println("Username UserDTO: %s".formatted(userDTO.getUsername()));
-            System.out.println("Username Original:" + originalUsername);
-            preparedStatement.setString(1, userDTO.getUsername());
-            preparedStatement.setString(2, userDTO.getBio());
-            preparedStatement.setString(3, userDTO.getImage());
-            preparedStatement.setString(4, originalUsername);
-
-            preparedStatement.execute();
-
-            return userDTO;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new  RuntimeException(e);
-        }
-    }
-
-    public User updateUserByUuid(User user){
+    public void updateUserByUuid(User user){
         try (
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USER_BY_UUID)
@@ -207,11 +145,30 @@ public class UserDbRepository implements UserRepository {
             preparedStatement.setInt(9, user.getCredit());
             preparedStatement.setString(10, user.getUuid());
             preparedStatement.execute();
-
-            return user;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    public UserDTO updateUserDataByUserName(String originalUsername, UserDTO userDTO){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USERDATA_BY_USERNAME)
+        ) {
+            System.out.println("Username UserDTO: %s".formatted(userDTO.getUsername()));
+            System.out.println("Username Original:" + originalUsername);
+            preparedStatement.setString(1, userDTO.getUsername());
+            preparedStatement.setString(2, userDTO.getBio());
+            preparedStatement.setString(3, userDTO.getImage());
+            preparedStatement.setString(4, originalUsername);
+
+            preparedStatement.execute();
+
+            return userDTO;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new  RuntimeException(e);
         }
     }
 }

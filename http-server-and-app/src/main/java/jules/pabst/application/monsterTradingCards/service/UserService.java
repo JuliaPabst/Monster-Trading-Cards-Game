@@ -69,10 +69,11 @@ public class UserService {
         if (originalUser.isPresent()) {
             return originalUser.get();
         }
+
         throw new UserNotFound("User not found");
     }
 
-    public UserDTO updateUserData (UserUpdateDTO user, String authenticationToken, String pathName) {
+    public UserDTO updateUserDataByUserName (UserUpdateDTO user, String authenticationToken, String pathName) {
         if (authenticationToken.contains(pathName)) {
             Optional<User> originalUser = userRepository.findUserByAuthenticationToken(authenticationToken);
             if (originalUser.isPresent()) {
@@ -103,7 +104,7 @@ public class UserService {
                     userDTO.setImage(user.getImage());
                 }
 
-                return userRepository.updateUserData(originalUser.get().getUsername(), userDTO);
+                return userRepository.updateUserDataByUserName(originalUser.get().getUsername(), userDTO);
 
             }
             throw new UserNotFound("User not found");
