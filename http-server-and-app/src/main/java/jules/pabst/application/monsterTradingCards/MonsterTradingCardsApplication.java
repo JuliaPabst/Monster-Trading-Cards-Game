@@ -57,6 +57,8 @@ public class MonsterTradingCardsApplication implements Application {
         StatsService statsService = new StatsService(userRepository);
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);
         BattleService battleService = new BattleService(userRepository, cardRepository, userService);
+        TradeRepository tradeRepository = new TradeDbRepository(connectionPool);
+        TradeService tradeService = new TradeService(userService, tradeRepository, cardService);
 
         this.router.addRoute("/cards", new CardsController(cardService, userService, packageService));
         this.router.addRoute("/deck", new DeckController(deckService, cardService));
@@ -67,5 +69,6 @@ public class MonsterTradingCardsApplication implements Application {
         this.router.addRoute("/stats", new StatsController(statsService));
         this.router.addRoute("/scoreboard", new ScoreboardController(scoreboardService));
         this.router.addRoute("/battles", new BattlesController(battleService));
+        this.router.addRoute("/tradings", new TradeController(tradeService));
     }
 }

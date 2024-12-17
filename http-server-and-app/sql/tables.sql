@@ -43,3 +43,15 @@ CREATE TABLE IF NOT EXISTS decks (
 );
 
 ALTER TABLE cards ADD COLUMN deckId int;
+
+CREATE TABLE IF NOT EXISTS trades (
+     id VARCHAR(255) PRIMARY KEY,
+     card1_id VARCHAR(255) NOT NULL,
+     card2_id VARCHAR(255) NOT NULL,
+     card1_new_owner_id VARCHAR(255) NOT NULL,
+     card2_new_owner_id VARCHAR(255) NOT NULL,
+     type VARCHAR(255),
+     minimum_damage int,
+     FOREIGN KEY (card1_id) REFERENCES cards(id),
+     FOREIGN KEY (card2_id) REFERENCES cards(id)
+);
