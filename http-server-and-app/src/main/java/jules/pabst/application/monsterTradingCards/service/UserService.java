@@ -3,6 +3,7 @@ package jules.pabst.application.monsterTradingCards.service;
 import jules.pabst.application.monsterTradingCards.DTOs.UserCreationDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
 import jules.pabst.application.monsterTradingCards.DTOs.UserUpdateDTO;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
 import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
@@ -72,6 +73,10 @@ public class UserService {
         }
 
         throw new UserNotFound("User not found");
+    }
+
+    public Optional<User> readOwnerOfCard(Card card){
+        return userRepository.findOwnerOfCard(card);
     }
 
     public UserDTO updateUserDataByUserName (UserUpdateDTO user, String authenticationToken, String pathName) {

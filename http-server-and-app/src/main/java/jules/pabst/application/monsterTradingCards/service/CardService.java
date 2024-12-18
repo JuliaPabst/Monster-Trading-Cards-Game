@@ -2,14 +2,17 @@ package jules.pabst.application.monsterTradingCards.service;
 
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.CardPackage;
+import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
+import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
 import jules.pabst.application.monsterTradingCards.exception.NotNull;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CardService {
@@ -50,5 +53,41 @@ public class CardService {
             throw new NoPackagesOwned("This user does not own any cards");
         }
 
+    }
+
+    public Optional<Card> checkIfCardIsOwnedByTrader(User user, TradingDeal tradingDeal){
+        List<Card> cards = cardRepository.findCardsByUserUuid(user);
+        if (cards.isEmpty()) {
+            throw new CardsNotFound("No cards belonging to the provided user");
+        }
+
+        for(Card card : cards) {
+            System.out.println("Current card id: " + card.getId());
+            System.out.println("Trading deal id: " + tradingDeal.getCardToTrade());
+            if(card.getId().equals(tradingDeal.getCardToTrade())){
+                return Optional.of(card);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Card> readCardNotOwnedByTraderWithDamage(User user, TradingDeal tradingDeal){
+        List<Card> cards = cardRepository.findCardsNotOwnedByUserWithDamage(user, tradingDeal);
+        if (cards.isEmpty()) {
+            throw new CardsNotFound("No cards that have a damage bigger than the requested damage and that don't belong to the trader");
+        }
+
+        for(Card card : cards) {
+            System.out.println("Current card name: " + card.getName());
+            if(tradingDeal.getType().getName().contains("spell")){
+                if(card.getName().contains("Spell")){
+                    return Optional.of(card);
+                }
+            }
+            return Optional.of(card);
+        }
+
+        return Optional.empty();
     }
 }

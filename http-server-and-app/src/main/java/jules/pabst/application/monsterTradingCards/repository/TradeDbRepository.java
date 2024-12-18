@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class TradeDbRepository implements TradeRepository {
     private final static String  NEW_DEAL = "INSERT INTO trades (id, card1_id, card2_id, card1_new_owner_id, card2_new_owner_id, type, minimum_damage) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -33,7 +32,7 @@ public class TradeDbRepository implements TradeRepository {
             preparedStatement.setString(4, tradeDTO.getCard1NewOwnerId());
             preparedStatement.setString(5, tradeDTO.getCard2NewOwnerId());
             preparedStatement.setString(6, tradeDTO.getType());
-            preparedStatement.setInt(7, tradeDTO.getMinimumDamage());
+            preparedStatement.setFloat(7, tradeDTO.getMinimumDamage());
             preparedStatement.execute();
             return tradeDTO;
         } catch (SQLException e) {

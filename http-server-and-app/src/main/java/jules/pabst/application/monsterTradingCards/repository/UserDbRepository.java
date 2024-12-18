@@ -1,6 +1,7 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.User;
 
 import java.sql.ResultSet;
@@ -20,6 +21,7 @@ public class UserDbRepository implements UserRepository {
     private final static String FIND_ALL_USERS = "SELECT * FROM users";
     private final static String FIND_USER_BY_USERNAME = "SELECT * FROM users WHERE username = ?";
     private final static String FIND_USER_BY_TOKEN = "SELECT * FROM users WHERE token = ?";
+    private final static String FIND_OWNER_OF_CARD = "SELECT u.* FROM users u JOIN packages p ON u.uuid = p.owner_id JOIN cards c ON c.package_id = p.id WHERE c.id = ? ";
     private final static String READ_CURRENT_CREDIT = "SELECT credit FROM users WHERE username = ?";
     private final static String UPDATE_USER_BY_UUID = "UPDATE users SET username = ?, password = ?, bio = ?, image = ?, elo = ?, wins = ?, losses = ?, token = ?, credit = ? WHERE uuid = ?";
     private final static String UPDATE_USERDATA_BY_USERNAME = "UPDATE users SET username = ?, bio = ?, image= ? WHERE username = ?";
@@ -108,6 +110,24 @@ public class UserDbRepository implements UserRepository {
             throw new RuntimeException(e);
         }
 
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<User> findOwnerOfCard(Card card){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(FIND_OWNER_OF_CARD)
+        ) {
+            preparedStatement.setString(1, card.getId());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         return Optional.empty();
     }
 

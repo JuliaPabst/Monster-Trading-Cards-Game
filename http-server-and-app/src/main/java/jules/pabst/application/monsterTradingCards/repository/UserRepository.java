@@ -1,6 +1,7 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
 import jules.pabst.application.monsterTradingCards.DTOs.UserDTO;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.User;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface UserRepository {
     List<User> findAllUsers();
     Optional<User> findUserByName(String name);
     Optional<User>findUserByAuthenticationToken(String authenticationToken);
-
+    Optional<User> findOwnerOfCard(Card card);
     int readCurrentCredit(User user);
 
     void updateUserByUuid(User user);

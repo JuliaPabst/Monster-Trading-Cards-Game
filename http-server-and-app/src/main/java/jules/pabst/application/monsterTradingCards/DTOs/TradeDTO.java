@@ -7,9 +7,9 @@ public class TradeDTO {
     private String card1NewOwnerId;
     private String card2NewOwnerId;
     private String type;
-    private int minimumDamage;
+    private float minimumDamage;
 
-    public TradeDTO(String tradeId, String card1Id, String card2Id, String card1NewOwnerId, String card2NewOwnerId, String type, int minimumDamage) {
+    public TradeDTO(String tradeId, String card1Id, String card2Id, String card1NewOwnerId, String card2NewOwnerId, String type, float minimumDamage) {
         this.tradeId = tradeId;
         this.card1Id = card1Id;
         this.card2Id = card2Id;
@@ -66,11 +66,11 @@ public class TradeDTO {
         this.type = type;
     }
 
-    public int getMinimumDamage() {
+    public float getMinimumDamage() {
         return minimumDamage;
     }
 
-    public void setMinimumDamage(int minimumDamage) {
+    public void setMinimumDamage(float minimumDamage) {
         this.minimumDamage = minimumDamage;
     }
 }

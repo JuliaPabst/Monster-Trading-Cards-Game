@@ -4,8 +4,7 @@ import jules.pabst.application.monsterTradingCards.DTOs.TradeDTO;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
 import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
-import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
-import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
+import jules.pabst.application.monsterTradingCards.exception.*;
 import jules.pabst.application.monsterTradingCards.service.TradeService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
@@ -45,6 +44,19 @@ public class TradeController extends Controller {
     }
 
     private Response createTradeDeal(Request request) {
-        return new Response();
+        try {
+            String auth = getAuthorizationToken(request);
+            TradingDeal tradingDeal = fromBody(request.getBody(), TradingDeal.class);
+            TradeDTO tradeDTO = tradeService.createTradeDeal(auth, tradingDeal);
+            return json(Status.CREATED, tradeDTO);
+        } catch(UserNotFound e){
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(MissingAuthorizationHeader | CardsNotFound | CardNotOwned e){
+            return json(Status.BAD_REQUEST, new ErrorResponse(e.getMessage()));
+        } catch(NotAuthorized e){
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
+        } catch(Exception e){
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
+        }
     }
 }

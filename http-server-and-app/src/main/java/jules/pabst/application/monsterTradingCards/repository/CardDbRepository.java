@@ -3,6 +3,7 @@ package jules.pabst.application.monsterTradingCards.repository;
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.CardPackage;
+import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 
@@ -21,6 +22,8 @@ public class CardDbRepository implements CardRepository {
             = "SELECT * FROM cards";
     private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where package_id = ?";
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
+    private final static String CARDS_BELONGING_TO_USER = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id = ?";
+    private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
     private final static String UPDATED_CARDS = "UPDATE cards set deck_user_id = ? where id = ?";
     private final ConnectionPool connectionPool;
@@ -108,6 +111,49 @@ public class CardDbRepository implements CardRepository {
                 Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
                 cards.add(card);
             }
+            return cards;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Card> findCardsByUserUuid(User user){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_USER);
+        ) {
+            List<Card> cards = new ArrayList<>();
+            preparedStatement.setString(1, user.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                cards.add(card);
+            }
+
+            return cards;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Card> findCardsNotOwnedByUserWithDamage(User user, TradingDeal tradingDeal){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE);
+        ) {
+            List<Card> cards = new ArrayList<>();
+            preparedStatement.setString(1, user.getUuid());
+            preparedStatement.setFloat(2, tradingDeal.getMinimumDamage());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                cards.add(card);
+            }
+
             return cards;
         } catch (SQLException e) {
             e.printStackTrace();
