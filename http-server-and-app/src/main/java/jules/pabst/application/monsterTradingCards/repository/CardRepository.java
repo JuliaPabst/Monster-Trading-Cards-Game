@@ -9,7 +9,6 @@ import java.util.Optional;
 public interface CardRepository {
     List<Optional<Card>> findAll();
     Card save(Card card);
-    List<Card> findCardsByPackage(List<CardPackage>  cardPackages);
     List<Card> findCardsByDeck(User user);
     List<Card> findCardsByUserUuid(User user);
     List<Card> findCardsNotOwnedByUserWithDamage(User user, TradingDeal tradingDeal);

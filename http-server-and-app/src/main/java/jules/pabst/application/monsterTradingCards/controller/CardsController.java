@@ -8,7 +8,6 @@ import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizatio
 import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
 import jules.pabst.application.monsterTradingCards.exception.UserNotFound;
 import jules.pabst.application.monsterTradingCards.service.CardService;
-import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Response;
@@ -24,12 +23,10 @@ import java.util.Optional;
 public class CardsController extends Controller {
     private final CardService cardsService;
     private final UserService userService;
-    private final PackageService packageService;
 
-    public CardsController(CardService cardsService, UserService userService, PackageService packageService) {
+    public CardsController(CardService cardsService, UserService userService) {
         this.cardsService = cardsService;
         this.userService = userService;
-        this.packageService = packageService;
     }
 
     @Override

@@ -11,6 +11,7 @@ import jules.pabst.application.monsterTradingCards.exception.NotNull;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +26,21 @@ public class CardService {
        this.packageRepository = packageRepository;
     }
 
-    public Card create(Card card) {
+    public List<Card> createPackage(String authToken, List<Card> cards) {
+        if(authToken.equals("admin-mtcgToken")){
+            List<Card> newCards = new ArrayList<>();
+            cards.forEach(card -> {
+               Card newCard = createCard(card);
+               newCards.add(newCard);
+            });
+
+            return newCards;
+        }
+
+        throw new NotAuthorized("Only admins can create packages");
+    }
+
+    public Card createCard(Card card) {
         if (card == null) {
             throw new NotNull("Card cannot be null");
         }
@@ -44,7 +59,7 @@ public class CardService {
 
     public List<Card> readByUserToken(User user){
         try{
-            List<CardPackage> packagesOwnedByUser = packageRepository.findPackagesByOwner(user);
+            List<Card> cardOwnedByUser = cardRepository.findCardsByUserUuid(user);
             if(!packagesOwnedByUser.isEmpty()){
                 return cardRepository.findCardsByPackage(packagesOwnedByUser);
             }

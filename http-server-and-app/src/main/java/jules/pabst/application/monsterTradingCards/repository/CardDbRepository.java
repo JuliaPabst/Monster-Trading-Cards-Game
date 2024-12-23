@@ -20,9 +20,8 @@ public class CardDbRepository implements CardRepository {
             = "INSERT INTO cards VALUES (?, ?, ?, ?)";
     private final static String ALL_CARDS
             = "SELECT * FROM cards";
-    private final static String CARDS_BELONGING_TO_PACKAGE = "SELECT * from cards where package_id = ?";
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
-    private final static String CARDS_BELONGING_TO_USER = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id = ?";
+    private final static String CARDS_BELONGING_TO_USER = "SELECT * FROM cards WHERE owner_id = ?";
     private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
     private final static String UPDATED_CARDS = "UPDATE cards set deck_user_id = ? where id = ?";
@@ -68,34 +67,6 @@ public class CardDbRepository implements CardRepository {
         }
 
         return cards;
-    }
-
-    public List<Card> findCardsByPackage(List<CardPackage> cardPackages){
-        List<Card> cards = new ArrayList<>();
-
-        for(CardPackage cardPackage : cardPackages){
-            try (
-                    Connection connection = connectionPool.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_PACKAGE);
-            ) {
-
-                preparedStatement.setString(1, cardPackage.getId());
-                ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
-                    cards.add(card);
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-        }
-
-        if (!cards.isEmpty()) {
-            return cards;
-        }
-
-        throw new CardsNotFound("No cards belonging to the requested package");
     }
 
     public List<Card> findCardsByDeck(User user){

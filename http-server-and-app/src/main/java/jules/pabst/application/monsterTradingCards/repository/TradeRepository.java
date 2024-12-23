@@ -10,4 +10,6 @@ public interface TradeRepository {
     TradeDTO save(TradeDTO tradeDTO);
 
     List<TradeDTO> findAllTradesByUserUuid(User user);
+
+    String delete(String tradeId);
 }

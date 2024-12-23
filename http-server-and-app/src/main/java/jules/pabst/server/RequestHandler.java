@@ -11,7 +11,7 @@ import jules.pabst.server.Application;
 import java.io.IOException;
 import java.net.Socket;
 
-public class RequestHandler {
+public class RequestHandler implements Runnable{
 
     // [x] receive socket
     // [x] wrap socket in HttpSocket
@@ -53,5 +53,10 @@ public class RequestHandler {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public void run() {
+        this.handle();
     }
 }

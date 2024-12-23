@@ -6,6 +6,18 @@ public class TradingDeal {
     private TradeType type;
     private float minimumDamage;
 
+    TradingDeal(String id) {
+        this.id = id;
+        this.minimumDamage = 0;
+    }
+
+    TradingDeal(String id, String cardToTrade, TradeType type, float minimumDamage) {
+        this.id = id;
+        this.cardToTrade = cardToTrade;
+        this.type = type;
+        this.minimumDamage = minimumDamage;
+    }
+
     public String getId() {
         return id;
     }

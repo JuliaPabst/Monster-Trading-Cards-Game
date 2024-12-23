@@ -48,4 +48,18 @@ public class TradeService {
         }
         throw(new NotAuthorized("Card is not belonging to the provided user"));
     }
+
+    public List<TradeDTO> deleteTradeDeals(String auth, String tradeId){
+        User user = userService.getUserByAuthenticationToken(auth);
+        List<TradeDTO> tradeDTOS = tradeRepository.findAllTradesByUserUuid(user);
+
+        for(TradeDTO tradeDTO : tradeDTOS){
+            if(tradeDTO.getTradeId().equals(tradeId)){
+                tradeRepository.delete(tradeId);
+                return tradeRepository.findAllTradesByUserUuid(user);
+            }
+        }
+
+        throw(new NotAuthorized("This card has not been traded by this user"));
+    }
 }

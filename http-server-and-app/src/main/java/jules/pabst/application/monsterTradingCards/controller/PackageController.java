@@ -38,7 +38,7 @@ public class PackageController extends Controller {
             String authToken = getAuthorizationToken(request);
             List<Card> cards = arrayFromBody(request.getBody(), new TypeReference<List<Card>>() {});
 
-            cards = packageService.createPackage(authToken, cards);
+            cards = cardService.createPackage(authToken, cards);
 
             return json(Status.CREATED, cards);
         } catch (NotAuthorized e){

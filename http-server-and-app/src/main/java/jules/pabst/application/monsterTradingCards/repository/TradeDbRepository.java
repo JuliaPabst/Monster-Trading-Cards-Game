@@ -14,6 +14,7 @@ import java.util.List;
 public class TradeDbRepository implements TradeRepository {
     private final static String  NEW_DEAL = "INSERT INTO trades (id, card1_id, card2_id, card1_new_owner_id, card2_new_owner_id, type, minimum_damage) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private final static String FIND_DEALS_BY_USER_UUID = "SELECT * FROM trades WHERE card1_new_owner_id = ? OR card2_new_owner_id = ?";
+    private final static String DELETE_DEAL = "DELETE FROM trades WHERE id = ?";
 
     private final ConnectionPool connectionPool;
     public TradeDbRepository(ConnectionPool connectionPool) {
@@ -62,5 +63,20 @@ public class TradeDbRepository implements TradeRepository {
         }
 
         return tradeDTOs;
+    }
+
+    @Override
+    public String delete(String tradeId){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_DEAL)
+        ) {
+            preparedStatement.setString(1, tradeId);
+            preparedStatement.execute();
+            return tradeId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }
