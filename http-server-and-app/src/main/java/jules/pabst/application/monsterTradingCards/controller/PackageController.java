@@ -2,26 +2,20 @@ package jules.pabst.application.monsterTradingCards.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import jules.pabst.application.monsterTradingCards.entity.Card;
-import jules.pabst.application.monsterTradingCards.exception.InvalidUserCredentials;
 import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
-import jules.pabst.application.monsterTradingCards.exception.UserAlreadyExists;
 import jules.pabst.application.monsterTradingCards.service.CardService;
-import jules.pabst.application.monsterTradingCards.service.PackageService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
 
 import java.util.List;
-import java.util.UUID;
 
 public class PackageController extends Controller {
     private final CardService cardService;
-    private final PackageService packageService;
 
-    public PackageController(CardService cardService, PackageService packageService) {
+    public PackageController(CardService cardService) {
         this.cardService = cardService;
-        this.packageService = packageService;
     }
 
     @Override

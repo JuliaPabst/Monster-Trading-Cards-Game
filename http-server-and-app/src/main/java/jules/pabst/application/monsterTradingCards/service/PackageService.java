@@ -28,36 +28,4 @@ public class PackageService {
         this.userService = userService;
     }
 
-    public List<Card> createPackage(String authToken, List<Card> cards) {
-        if(authToken.equals("admin-mtcgToken")){
-            String packageId = UUID.randomUUID().toString();
-
-            packageRepository.save(packageId);
-
-            cards.forEach(card -> {
-                card.setPackageId(packageId);
-                cardService.create(card);
-            });
-
-            return cards;
-        }
-
-        throw new NotAuthorized("Only admins can create packages");
-    }
-
-    public AquirePackageDTO checkCreditAndAquire(String authtoken){
-        User user = userService.getUserByAuthenticationToken(authtoken);
-        System.out.println("User credit: %d".formatted(user.getCredit()));
-        if(user.getCredit()>=5){
-            String packageIdWithoutOwner = packageRepository.findPackageWithoutOwner();
-
-            user.setCredit(user.getCredit()-5);
-
-            userRepository.updateUserByUuid(user);
-
-            return packageRepository.updatePackage(packageIdWithoutOwner, user);
-        }
-
-        throw(new NotEnoughCredit("Not enough credit"));
-    }
 }

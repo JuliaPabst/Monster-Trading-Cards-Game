@@ -22,6 +22,7 @@ public class CardDbRepository implements CardRepository {
             = "SELECT * FROM cards";
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
     private final static String CARDS_BELONGING_TO_USER = "SELECT * FROM cards WHERE owner_id = ?";
+    private final static String CARDS_NOT_BELONGING_TO_ANY_USER = "SELECT * FROM cards WHERE owner_id is NULL";
     private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
     private final static String UPDATED_CARDS = "UPDATE cards set deck_user_id = ? where id = ?";
@@ -94,6 +95,27 @@ public class CardDbRepository implements CardRepository {
         try (
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_USER);
+        ) {
+            List<Card> cards = new ArrayList<>();
+            preparedStatement.setString(1, user.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                cards.add(card);
+            }
+
+            return cards;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Card> findCardsNotBelongingToAnyUser(User user){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_NOT_BELONGING_TO_ANY_USER);
         ) {
             List<Card> cards = new ArrayList<>();
             preparedStatement.setString(1, user.getUuid());

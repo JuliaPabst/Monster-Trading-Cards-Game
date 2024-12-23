@@ -31,21 +31,6 @@ public class PackageDbRepository implements PackageRepository {
     }
 
     @Override
-    public String save(String packageId) {
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(NEW_PACKAGE)
-        ) {
-            preparedStatement.setString(1, packageId);
-            preparedStatement.execute();
-            return packageId;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public String findPackageWithoutOwner(){
         try (
                 Connection connection = connectionPool.getConnection();
@@ -64,34 +49,6 @@ public class PackageDbRepository implements PackageRepository {
             }
 
             throw(new AllPackagesOwned("All Packages are already owned by someone"));
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<CardPackage> findPackagesByOwner(User user){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(FIND_PACKAGES_BY_OWNER)
-        ) {
-            List<CardPackage> packages = new ArrayList<>();
-
-            preparedStatement.setString(1, user.getUuid());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                System.out.println("id: %s".formatted(resultSet.getString("id")));
-                CardPackage newPackage = new CardPackage(resultSet.getString("id"), Optional.ofNullable(resultSet.getString("owner_id")));
-                packages.add(newPackage);
-            }
-
-            if (!packages.isEmpty()) {
-                System.out.println("-----------------");
-                return packages;
-            }
-
-            throw(new NoPackagesOwned("This user does not own any packages"));
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

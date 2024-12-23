@@ -1,13 +1,11 @@
 package jules.pabst.application.monsterTradingCards.service;
 
+import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
-import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
-import jules.pabst.application.monsterTradingCards.exception.NoPackagesOwned;
-import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
-import jules.pabst.application.monsterTradingCards.exception.NotNull;
+import jules.pabst.application.monsterTradingCards.exception.*;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
 
@@ -20,10 +18,12 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final PackageRepository packageRepository;
+    private final UserService userService;
 
-    public CardService(CardRepository cardRepository, PackageRepository packageRepository) {
+    public CardService(CardRepository cardRepository, PackageRepository packageRepository, UserService userService) {
        this.cardRepository = cardRepository;
        this.packageRepository = packageRepository;
+       this.userService = userService;
     }
 
     public List<Card> createPackage(String authToken, List<Card> cards) {
@@ -60,14 +60,36 @@ public class CardService {
     public List<Card> readByUserToken(User user){
         try{
             List<Card> cardOwnedByUser = cardRepository.findCardsByUserUuid(user);
-            if(!packagesOwnedByUser.isEmpty()){
-                return cardRepository.findCardsByPackage(packagesOwnedByUser);
+            if(cardOwnedByUser.isEmpty()){
+                throw new CardsNotFound("This user does not own any cards");
             }
-            throw new CardsNotFound("This user does not own any cards");
+            return cardOwnedByUser;
         } catch(NoPackagesOwned e){
             throw new NoPackagesOwned("This user does not own any cards");
         }
+    }
 
+
+    public AquirePackageDTO checkCreditAndAquire(String authtoken){
+        User user = userService.getUserByAuthenticationToken(authtoken);
+        System.out.println("User credit: %d".formatted(user.getCredit()));
+        if(user.getCredit()>=5){
+            List<Card> cardsToAquire = new ArrayList<>();
+            List<Card> cardsWithoutOwner = cardRepository.findCardsNotBelongingToAnyUser(user);
+
+            for(int i = 0; i < 5; i++){
+                Card card = cardRepository.changeOwner(cardsWithoutOwner.get(i));
+                cardsToAquire.add(cardsWithoutOwner.get(i));
+            }
+
+            user.setCredit(user.getCredit()-5);
+
+            userRepository.updateUserByUuid(user);
+
+            return packageRepository.updatePackage(packageIdWithoutOwner, user);
+        }
+
+        throw(new NotEnoughCredit("Not enough credit"));
     }
 
     public Optional<Card> checkIfCardIsOwnedByTrader(User user, TradingDeal tradingDeal){

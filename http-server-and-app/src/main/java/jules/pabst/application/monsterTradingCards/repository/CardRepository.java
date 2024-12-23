@@ -11,6 +11,7 @@ public interface CardRepository {
     Card save(Card card);
     List<Card> findCardsByDeck(User user);
     List<Card> findCardsByUserUuid(User user);
+    List<Card> findCardsNotBelongingToAnyUser(User user);
     List<Card> findCardsNotOwnedByUserWithDamage(User user, TradingDeal tradingDeal);
     List<Card> findCardsById(List<String> cardIds);
     List<Card> updateDeckUserId(List<Card> cards);
