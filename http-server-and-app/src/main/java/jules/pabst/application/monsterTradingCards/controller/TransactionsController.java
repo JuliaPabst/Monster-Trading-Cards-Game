@@ -1,25 +1,24 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
-import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.entity.ErrorResponse;
-import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.*;
-import jules.pabst.application.monsterTradingCards.service.PackageService;
+import jules.pabst.application.monsterTradingCards.service.CardService;
 import jules.pabst.application.monsterTradingCards.service.UserService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
 
-import java.util.Optional;
+import java.util.List;
 
 public class TransactionsController extends Controller{
     UserService userService;
-    PackageService packageService;
+    CardService cardService;
 
-    public TransactionsController(UserService userservice, PackageService packageService){
+    public TransactionsController(UserService userservice, CardService cardservice) {
         this.userService = userservice;
-        this.packageService = packageService;
+        this.cardService = cardService;
     }
 
     public Response handle(Request request){
@@ -33,8 +32,8 @@ public class TransactionsController extends Controller{
     public Response aquirePackage(Request request){
         try {
             String authToken = getAuthorizationToken(request);
-            AquirePackageDTO aquirePackageDTO =  packageService.checkCreditAndAquire(authToken);
-            return json(Status.CREATED, aquirePackageDTO);
+            List<Card> aquiredCards =  cardService.checkCreditAndAquire(authToken);
+            return json(Status.CREATED, aquiredCards);
         } catch(MissingAuthorizationHeader e){
             return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
         } catch(UserNotFound e){

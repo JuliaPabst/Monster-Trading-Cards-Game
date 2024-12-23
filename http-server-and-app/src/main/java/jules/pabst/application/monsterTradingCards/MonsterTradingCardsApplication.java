@@ -49,11 +49,9 @@ public class MonsterTradingCardsApplication implements Application {
         ConnectionPool connectionPool = new ConnectionPool();
         UserRepository userRepository = new UserDbRepository(connectionPool);
         UserService userService = new UserService(userRepository);
-        PackageRepository packageRepository = new PackageDbRepository(connectionPool);
         CardDbRepository cardRepository = new CardDbRepository(connectionPool);
-        CardService cardService = new CardService(cardRepository, packageRepository, userService);
-        PackageService packageService = new PackageService(packageRepository, userRepository, cardService, userService);
-        DeckService deckService = new DeckService(cardRepository, userRepository, packageRepository);
+        CardService cardService = new CardService(cardRepository, userService);
+        DeckService deckService = new DeckService(cardRepository, userService);
         StatsService statsService = new StatsService(userRepository);
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);
         BattleService battleService = new BattleService(userRepository, cardRepository, userService);
@@ -63,7 +61,7 @@ public class MonsterTradingCardsApplication implements Application {
         this.router.addRoute("/cards", new CardsController(cardService, userService));
         this.router.addRoute("/deck", new DeckController(deckService));
         this.router.addRoute("/sessions", new SessionController(userRepository));
-        this.router.addRoute("/transactions/packages", new TransactionsController(userService, packageService));
+        this.router.addRoute("/transactions/packages", new TransactionsController(userService, cardService));
         this.router.addRoute("/packages", new PackageController(cardService));
         this.router.addRoute("/users", new UsersController(userService));
         this.router.addRoute("/stats", new StatsController(statsService));

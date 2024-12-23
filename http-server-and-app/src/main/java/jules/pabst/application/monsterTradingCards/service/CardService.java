@@ -1,28 +1,22 @@
 package jules.pabst.application.monsterTradingCards.service;
 
-import jules.pabst.application.monsterTradingCards.DTOs.AquirePackageDTO;
 import jules.pabst.application.monsterTradingCards.entity.Card;
-import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.*;
 import jules.pabst.application.monsterTradingCards.repository.CardRepository;
-import jules.pabst.application.monsterTradingCards.repository.PackageRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public class CardService {
 
     private final CardRepository cardRepository;
-    private final PackageRepository packageRepository;
     private final UserService userService;
 
-    public CardService(CardRepository cardRepository, PackageRepository packageRepository, UserService userService) {
+    public CardService(CardRepository cardRepository, UserService userService) {
        this.cardRepository = cardRepository;
-       this.packageRepository = packageRepository;
        this.userService = userService;
     }
 
@@ -70,7 +64,7 @@ public class CardService {
     }
 
 
-    public AquirePackageDTO checkCreditAndAquire(String authtoken){
+    public List<Card> checkCreditAndAquire(String authtoken){
         User user = userService.getUserByAuthenticationToken(authtoken);
         System.out.println("User credit: %d".formatted(user.getCredit()));
         if(user.getCredit()>=5){
@@ -78,15 +72,16 @@ public class CardService {
             List<Card> cardsWithoutOwner = cardRepository.findCardsNotBelongingToAnyUser(user);
 
             for(int i = 0; i < 5; i++){
-                Card card = cardRepository.changeOwner(cardsWithoutOwner.get(i));
+                cardsWithoutOwner.get(i).setOwnerUuid(user.getUuid());
+                Card card = cardRepository.updateCard(cardsWithoutOwner.get(i));
                 cardsToAquire.add(cardsWithoutOwner.get(i));
             }
 
             user.setCredit(user.getCredit()-5);
 
-            userRepository.updateUserByUuid(user);
+            userService.updateUserByUuid(user);
 
-            return packageRepository.updatePackage(packageIdWithoutOwner, user);
+            return cardsToAquire;
         }
 
         throw(new NotEnoughCredit("Not enough credit"));

@@ -117,4 +117,8 @@ public class UserService {
         }
         throw new InvalidUserCredentials("No access rights of this user's data");
     }
+
+    public void updateUserByUuid(User user){
+       userRepository.updateUserByUuid(user);
+    }
 }

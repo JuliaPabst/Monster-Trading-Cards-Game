@@ -14,5 +14,6 @@ public interface CardRepository {
     List<Card> findCardsNotBelongingToAnyUser(User user);
     List<Card> findCardsNotOwnedByUserWithDamage(User user, TradingDeal tradingDeal);
     List<Card> findCardsById(List<String> cardIds);
+    Card updateCard(Card card);
     List<Card> updateDeckUserId(List<Card> cards);
 }

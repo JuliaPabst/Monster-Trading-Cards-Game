@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class CardDbRepository implements CardRepository {
     private final static String NEW_CARD
-            = "INSERT INTO cards VALUES (?, ?, ?, ?)";
+            = "INSERT INTO cards VALUES (?, ?, ?)";
     private final static String ALL_CARDS
             = "SELECT * FROM cards";
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
@@ -25,7 +25,7 @@ public class CardDbRepository implements CardRepository {
     private final static String CARDS_NOT_BELONGING_TO_ANY_USER = "SELECT * FROM cards WHERE owner_id is NULL";
     private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_id != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
-    private final static String UPDATED_CARDS = "UPDATE cards set deck_user_id = ? where id = ?";
+    private final static String UPDATED_CARD = "UPDATE cards SET owner_uuid = ?, deck_user_id = ? where id = ?";
     private final ConnectionPool connectionPool;
 
     public CardDbRepository(ConnectionPool connectionPool) {
@@ -42,7 +42,6 @@ public class CardDbRepository implements CardRepository {
             preparedStatement.setString(1, card.getId());
             preparedStatement.setString(2, card.getName());
             preparedStatement.setFloat(3, card.getDamage());
-            preparedStatement.setString(4, card.getPackageId());
             preparedStatement.execute();
             return card;
         } catch (SQLException e) {
@@ -182,14 +181,33 @@ public class CardDbRepository implements CardRepository {
         throw new CardsNotFound("No cards belonging to the provided ids");
     }
 
+    public Card updateCard(Card card){
+        try (
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD);
+        ) {
+            preparedStatement.setString(1, card.getOwnerUuid());
+            preparedStatement.setString(2, card.getDeckUserId());
+            preparedStatement.setString(3, card.getId());
+            preparedStatement.execute();
+            System.out.println("Updated card: " + card.getId());
+
+            return card;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     public List<Card> updateDeckUserId(List<Card> cards){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARDS);
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD);
         ) {
             for(Card card : cards){
-                preparedStatement.setString(1, card.getDeckUserId());
-                preparedStatement.setString(2, card.getId());
+                preparedStatement.setString(1, card.getOwnerUuid());
+                preparedStatement.setString(2, card.getDeckUserId());
+                preparedStatement.setString(3, card.getId());
                 preparedStatement.execute();
                 System.out.println("Updated card: " + card.getId());
             }
