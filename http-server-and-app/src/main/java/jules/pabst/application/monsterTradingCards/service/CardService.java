@@ -70,10 +70,13 @@ public class CardService {
         if(user.getCredit()>=5){
             List<Card> cardsToAquire = new ArrayList<>();
             List<Card> cardsWithoutOwner = cardRepository.findCardsNotBelongingToAnyUser(user);
+            if(cardsWithoutOwner.size() < 5){
+                throw new CardsNotFound("Not enough cards available");
+            }
 
             for(int i = 0; i < 5; i++){
                 cardsWithoutOwner.get(i).setOwnerUuid(user.getUuid());
-                Card card = cardRepository.updateCard(cardsWithoutOwner.get(i));
+                cardRepository.updateCard(cardsWithoutOwner.get(i));
                 cardsToAquire.add(cardsWithoutOwner.get(i));
             }
 

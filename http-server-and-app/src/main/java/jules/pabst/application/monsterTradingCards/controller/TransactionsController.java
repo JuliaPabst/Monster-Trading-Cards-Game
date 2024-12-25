@@ -16,7 +16,7 @@ public class TransactionsController extends Controller{
     UserService userService;
     CardService cardService;
 
-    public TransactionsController(UserService userservice, CardService cardservice) {
+    public TransactionsController(UserService userservice, CardService cardService) {
         this.userService = userservice;
         this.cardService = cardService;
     }
@@ -40,7 +40,7 @@ public class TransactionsController extends Controller{
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(NotEnoughCredit e) {
             return json(Status.PAYMENT_REQUIRED, new ErrorResponse(e.getMessage()));
-        } catch(AllPackagesOwned e) {
+        } catch(CardsNotFound e) {
             return json(Status.CONFLICT, new ErrorResponse(e.getMessage()));
         } catch (Exception e){
             return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
