@@ -160,26 +160,26 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #
 #if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
-# --------------------------------------------------
-echo "8) show all acquired cards kienboec"
-curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer kienboec-mtcgToken"
-echo "Should return HTTP 200 - and a list of all cards"
-echo "should fail (no token):"
-curl -i -X GET http://localhost:10001/cards
-echo "Should return HTTP 4xx - Unauthorized"
-echo .
-echo .
-
-if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
-
-# --------------------------------------------------
-echo "9) show all acquired cards altenhof"
-curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer altenhof-mtcgToken"
-echo "Should return HTTP 200 - and a list of all cards"
-echo .
-echo .
-
-if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+## --------------------------------------------------
+#echo "8) show all acquired cards kienboec"
+#curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer kienboec-mtcgToken"
+#echo "Should return HTTP 200 - and a list of all cards"
+#echo "should fail (no token):"
+#curl -i -X GET http://localhost:10001/cards
+#echo "Should return HTTP 4xx - Unauthorized"
+#echo .
+#echo .
+#
+#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+#
+## --------------------------------------------------
+#echo "9) show all acquired cards altenhof"
+#curl -i -X GET http://localhost:10001/cards --header "Authorization: Bearer altenhof-mtcgToken"
+#echo "Should return HTTP 200 - and a list of all cards"
+#echo .
+#echo .
+#
+#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 ## --------------------------------------------------
 #echo "10) show unconfigured deck"
@@ -225,34 +225,34 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #echo .
 #
 #if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
-#
-## --------------------------------------------------
-#echo "12) show configured deck"
-#curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer kienboec-mtcgToken"
-#echo "Should return HTTP 200 - and a list of all cards"
-#echo .
-#curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
-#echo "Should return HTTP 200 - and a list of all cards"
-#echo .
-#echo .
-#
-#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
-#
-#REM --------------------------------------------------
-#echo "13) show configured deck different representation"
-#echo kienboec
-#curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer kienboec-mtcgToken"
-#echo "Should return HTTP 200 - and a list of all cards"
-#echo .
-#echo .
-#echo altenhof
-#curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer altenhof-mtcgToken"
-#echo "Should return HTTP 200 - and a list of all cards"
-#echo .
-#echo .
-#
-#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
-#
+
+# --------------------------------------------------
+echo "12) show configured deck"
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer kienboec-mtcgToken"
+echo "Should return HTTP 200 - and a list of all cards"
+echo .
+curl -i -X GET http://localhost:10001/deck --header "Authorization: Bearer altenhof-mtcgToken"
+echo "Should return HTTP 200 - and a list of all cards"
+echo .
+echo .
+
+if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+
+REM --------------------------------------------------
+echo "13) show configured deck different representation"
+echo kienboec
+curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer kienboec-mtcgToken"
+echo "Should return HTTP 200 - and a list of all cards"
+echo .
+echo .
+echo altenhof
+curl -i -X GET "http://localhost:10001/deck?format=plain" --header "Authorization: Bearer altenhof-mtcgToken"
+echo "Should return HTTP 200 - and a list of all cards"
+echo .
+echo .
+
+if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+
 ## --------------------------------------------------
 #echo "14) edit user data"
 #echo .

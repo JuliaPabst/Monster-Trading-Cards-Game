@@ -26,7 +26,9 @@ public class DeckController extends Controller {
 
     @Override
     public Response handle(Request request) {
-        if(request.getMethod().equals(Method.GET)){
+        if(request.getMethod().equals(Method.GET) && request.getPath().contains("plain")){
+            return getDeckPlain(request);
+        }else if(request.getMethod().equals(Method.GET)){
             return getDeck(request);
         } else if(request.getMethod().equals(Method.PUT)){
             return configureDeck(request);
@@ -40,6 +42,18 @@ public class DeckController extends Controller {
             String authenticationToken = getAuthorizationToken(request);
             List<Card> cards = deckService.readDeck(authenticationToken);
             return json(Status.OK, cards);
+        } catch (UserNotFound e) {
+            return json(Status.NOT_FOUND, e);
+        } catch (Exception e) {
+            return json(Status.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    public Response getDeckPlain(Request request) {
+        try {
+            String authenticationToken = getAuthorizationToken(request);
+            List<Card> cards = deckService.readDeck(authenticationToken);
+            return returnPlain(Status.OK, cards);
         } catch (UserNotFound e) {
             return json(Status.NOT_FOUND, e);
         } catch (Exception e) {

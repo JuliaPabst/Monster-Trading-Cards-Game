@@ -5,12 +5,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jules.pabst.application.monsterTradingCards.entity.Card;
 import jules.pabst.application.monsterTradingCards.exception.InvalidBodyException;
 import jules.pabst.application.monsterTradingCards.exception.JsonParserException;
 import jules.pabst.application.monsterTradingCards.exception.MissingAuthorizationHeader;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
+
+import java.util.List;
 
 public abstract class Controller {
 
@@ -67,6 +70,29 @@ public abstract class Controller {
             throw new JsonParserException(e);
         }
 
+        return response;
+    }
+
+    protected Response returnPlain(Status status, List<Card> cards) {
+        Response response = new Response();
+        response.setStatus(status);
+        response.setHeader("Content-Type", "application/json");
+        StringBuilder body = new StringBuilder();
+        for(Card card : cards){
+            body.append("Card-Id: " + card.getId());
+            body.append("\r\n");
+            body.append("Card-Name: " + card.getName());
+            body.append("\r\n");
+            body.append("Card-Damage: " + card.getDamage());
+            body.append("\r\n");
+            body.append("Card-Owner-Uuid: " + card.getOwnerUuid());
+            body.append("\r\n");
+            body.append("Card-Deck-User-Uuid: " + card.getDeckUserId());
+            body.append("\r\n");
+            body.append("\r\n");
+        }
+
+        response.setBody(body.toString());
         return response;
     }
 }
