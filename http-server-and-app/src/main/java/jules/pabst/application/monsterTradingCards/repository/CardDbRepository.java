@@ -2,7 +2,6 @@ package jules.pabst.application.monsterTradingCards.repository;
 
 import jules.pabst.application.monsterTradingCards.data.ConnectionPool;
 import jules.pabst.application.monsterTradingCards.entity.Card;
-import jules.pabst.application.monsterTradingCards.entity.CardPackage;
 import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
@@ -20,8 +19,8 @@ public class CardDbRepository implements CardRepository {
             = "INSERT INTO cards VALUES (?, ?, ?)";
     private final static String ALL_CARDS
             = "SELECT * FROM cards";
-    private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_user_id = ?";
-    private final static String CARDS_BELONGING_TO_USER = "SELECT * FROM cards WHERE owner_id = ?";
+    private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_id = ?";
+    private final static String CARDS_BELONGING_TO_USER = "SELECT * FROM cards WHERE owner_uuid = ?";
     private final static String CARDS_NOT_BELONGING_TO_ANY_USER = "SELECT * FROM cards WHERE owner_uuid is NULL";
     private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_uuid != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
@@ -58,7 +57,7 @@ public class CardDbRepository implements CardRepository {
         ) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_id"));
                 cards.add(Optional.of(card));
             }
         } catch (SQLException e) {
@@ -79,7 +78,7 @@ public class CardDbRepository implements CardRepository {
             preparedStatement.setString(1, user.getUuid());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_id"));
                 cards.add(card);
             }
             return cards;
@@ -99,7 +98,7 @@ public class CardDbRepository implements CardRepository {
             preparedStatement.setString(1, user.getUuid());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_id"));
                 cards.add(card);
             }
 
@@ -141,7 +140,7 @@ public class CardDbRepository implements CardRepository {
             preparedStatement.setFloat(2, tradingDeal.getMinimumDamage());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_id"));
                 cards.add(card);
             }
 
@@ -164,7 +163,7 @@ public class CardDbRepository implements CardRepository {
                 preparedStatement.setString(1, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("package_id"), resultSet.getString("deck_user_id"));
+                    Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_id"));
                     cards.add(card);
                 }
             } catch (SQLException e) {
