@@ -10,6 +10,7 @@ import jules.pabst.server.http.Status;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class BattlesController extends Controller {
     private final BattleService battleService;
@@ -39,12 +40,19 @@ public class BattlesController extends Controller {
             String opponentAuth = battleQueue.keys().nextElement();
             battleQueue.remove(opponentAuth);
 
-            executor.submit(() -> {
-                String battleLog = battleService.battle(auth, opponentAuth);
-                System.out.println(battleLog);
+            Future<String> futureBattleLog = executor.submit(() -> {
+                return battleService.battle(auth, opponentAuth);
             });
 
-            return json(Status.OK, "Battle started with an opponent!");
+            try {
+                String battleLog = futureBattleLog.get();
+                System.out.println(battleLog);
+                return json(Status.OK, battleLog);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return json(Status.INTERNAL_SERVER_ERROR, "An error occurred while processing the battle.");
+            }
+
         }
     }
 }

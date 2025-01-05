@@ -1,21 +1,36 @@
 package jules.pabst.application.monsterTradingCards.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jules.pabst.application.monsterTradingCards.exception.InvalidCardType;
+
 public class TradingDeal {
     private String id;
     private String cardToTrade;
     private TradeType type;
     private float minimumDamage;
+    private TradeStatus tradeStatus;
 
-    TradingDeal(String id) {
+    public TradingDeal(@JsonProperty("Id") String id,
+                @JsonProperty("CardToTrade") String cardToTrade,
+                @JsonProperty("Type") String type,
+                @JsonProperty("MinimumDamage") float minimumDamage) {
         this.id = id;
-        this.minimumDamage = 0;
+        try {
+            this.type = TradeType.valueOf(type);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCardType("Invalid trade type: " + type);
+        }
+        this.cardToTrade = cardToTrade;
+        this.minimumDamage = minimumDamage;
+        this.tradeStatus = TradeStatus.valueOf("open");
     }
 
-    TradingDeal(String id, String cardToTrade, TradeType type, float minimumDamage) {
+    public TradingDeal(String id, String cardToTrade, String type, float minimumDamage, String tradeStatus) {
         this.id = id;
         this.cardToTrade = cardToTrade;
-        this.type = type;
+        this.type = TradeType.valueOf(type);
         this.minimumDamage = minimumDamage;
+        this.tradeStatus = TradeStatus.valueOf(tradeStatus);
     }
 
     public String getId() {
@@ -48,5 +63,13 @@ public class TradingDeal {
 
     public void setMinimumDamage(float minimumDamage) {
         this.minimumDamage = minimumDamage;
+    }
+
+    public TradeStatus getTradeStatus() {
+        return tradeStatus;
+    }
+
+    public void setTradeStatus(String tradeStatus) {
+        this.tradeStatus = TradeStatus.valueOf(tradeStatus);
     }
 }

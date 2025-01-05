@@ -90,7 +90,7 @@ public class CardService {
         throw(new NotEnoughCredit("Not enough credit"));
     }
 
-    public Optional<Card> checkIfCardIsOwnedByTrader(User user, TradingDeal tradingDeal){
+    public Card checkIfCardIsOwnedByTraderAndIsNotInDeck(User user, TradingDeal tradingDeal){
         List<Card> cards = cardRepository.findCardsByUserUuid(user);
         if (cards.isEmpty()) {
             throw new CardsNotFound("No cards belonging to the provided user");
@@ -100,29 +100,51 @@ public class CardService {
             System.out.println("Current card id: " + card.getId());
             System.out.println("Trading deal id: " + tradingDeal.getCardToTrade());
             if(card.getId().equals(tradingDeal.getCardToTrade())){
-                return Optional.of(card);
+               if(card.getDeckUserId() == null){
+                   return card;
+               }
+                throw new CardIsPartOfDeck("Traded card cannot be a part of the deck");
             }
         }
 
-        return Optional.empty();
+        throw new NotAuthorized("Card does not belong to the user");
     }
 
-    public Optional<Card> readCardNotOwnedByTraderWithDamage(User user, TradingDeal tradingDeal){
-        List<Card> cards = cardRepository.findCardsNotOwnedByUserWithDamage(user, tradingDeal);
-        if (cards.isEmpty()) {
-            throw new CardsNotFound("No cards that have a damage bigger than the requested damage and that don't belong to the trader");
-        }
+//    public Optional<Card> readCardNotOwnedByTraderWithDamage(User user, TradingDeal tradingDeal){
+//        List<Card> cards = cardRepository.findCardsNotOwnedByUserWithDamage(user, tradingDeal);
+//        if (cards.isEmpty()) {
+//            throw new CardsNotFound("No cards that have a damage bigger than the requested damage and that don't belong to the trader");
+//        }
+//
+//        for(Card card : cards) {
+//            System.out.println("Current card name: " + card.getName());
+//            if(card.getDeckUserId() == null) {
+//               return Optional.of(card);
+//            }
+//        }
+//
+//
+//    }
 
-        for(Card card : cards) {
-            System.out.println("Current card name: " + card.getName());
-            if(tradingDeal.getType().getName().contains("spell")){
-                if(card.getName().contains("Spell")){
-                    return Optional.of(card);
-                }
-            }
-            return Optional.of(card);
-        }
+    public Card updateDeckuserId(Card card){
+        card = cardRepository.updateCard(card);
+        return card;
+    }
 
-        return Optional.empty();
+    public List<Card> updateCards(List<Card> cards){
+        List<Card> updatedCards = new ArrayList<>();
+        for(Card card : cards){
+            card = cardRepository.updateCard(card);
+            updatedCards.add(card);
+        }
+        return updatedCards;
+    }
+
+    public List<Card> findCardsById(List<TradingDeal> tradingDeals){
+        List<String> ids = new ArrayList<>();
+        for(TradingDeal tradingDeal : tradingDeals){
+            ids.add(tradingDeal.getCardToTrade());
+        }
+        return cardRepository.findCardsById(ids);
     }
 }

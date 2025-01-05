@@ -54,7 +54,7 @@ public class MonsterTradingCardsApplication implements Application {
         DeckService deckService = new DeckService(cardRepository, userService);
         StatsService statsService = new StatsService(userRepository);
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);
-        BattleService battleService = new BattleService(userRepository, cardRepository, userService);
+        BattleService battleService = new BattleService(userRepository, cardRepository, userService, cardService);
         TradeRepository tradeRepository = new TradeDbRepository(connectionPool);
         TradeService tradeService = new TradeService(userService, tradeRepository, cardService);
 

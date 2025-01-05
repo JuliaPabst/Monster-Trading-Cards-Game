@@ -1,15 +1,15 @@
 package jules.pabst.application.monsterTradingCards.repository;
 
-import jules.pabst.application.monsterTradingCards.DTOs.TradeDTO;
-import jules.pabst.application.monsterTradingCards.entity.User;
+import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 
 import java.util.List;
 
 public interface TradeRepository {
 
-    TradeDTO save(TradeDTO tradeDTO);
-
-    List<TradeDTO> findAllTradesByUserUuid(User user);
+    TradingDeal save(TradingDeal tradeDeal);
+    TradingDeal updateTradeDealStatus(TradingDeal tradeDeal);
+    List<TradingDeal> findAllTradingDeals();
+    List<TradingDeal> findAllOpenTradingDeals();
 
     String delete(String tradeId);
 }
