@@ -5,6 +5,7 @@ import jules.pabst.application.monsterTradingCards.entity.TradingDeal;
 import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
+import jules.pabst.application.monsterTradingCards.exception.TradingDealNotFound;
 import jules.pabst.application.monsterTradingCards.repository.TradeRepository;
 
 import java.util.ArrayList;
@@ -51,62 +52,69 @@ public class TradeService {
         User user = userService.getUserByAuthenticationToken(auth);
         Card card = cardService.checkIfCardIsOwnedByTraderAndIsNotInDeck(user, tradingDeal);
 
-        List<TradingDeal> openTradingDeals = tradeRepository.findAllOpenTradingDeals();
-        List<Card> cards = cardService.findCardsById(openTradingDeals);
         tradeRepository.save(tradingDeal);
-
-        if(!openTradingDeals.isEmpty()){
-            return trade(card, cards, tradingDeal, openTradingDeals);
-        }
 
         return tradingDeal;
     }
 
-    public TradingDeal trade(Card card, List<Card> cards, TradingDeal tradingDeal, List<TradingDeal> openTradingDeals){
-        for(int i = 0; i < cards.size(); i++){
-            if(cards.get(i).getDamage() > tradingDeal.getMinimumDamage() && card.getDamage() > openTradingDeals.get(i).getMinimumDamage()){
-                // check if card fits spell constraints for chosen TradeDeal
-                if(openTradingDeals.get(i).getType().getName().equals("spell") && card.getName().contains("spell")){
-                    // check if chosen card fits constraints for current tradingDeal
-                    Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(card, cards, tradingDeal, openTradingDeals, i);
-                    if(updatedTradingDeal.isPresent()){
-                        return updatedTradingDeal.get();
-                    }
-                }
+    public TradingDeal trade(String auth, String tradeId, String cardId){
+        User user = userService.getUserByAuthenticationToken(auth);
+        List<TradingDeal> openTradingDeals = tradeRepository.findAllOpenTradingDeals();
+        List<Card> cards = cardService.findCardsById(openTradingDeals);
+        TradingDeal currentTradingDeal = null;
+        Card selectedCard = null;
 
-                // check if card fits monster constraints for chosen TradeDeal
-                if(openTradingDeals.get(i).getType().getName().equals("monster") && !card.getName().contains("spell")){
-                    // check if chosen card fits constraints for current tradingDeal
-                    Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(card, cards, tradingDeal, openTradingDeals, i);
-                    if(updatedTradingDeal.isPresent()){
-                        return updatedTradingDeal.get();
-                    }
+        for(TradingDeal tradingDeal : openTradingDeals){
+            if(tradingDeal.getId().equals(tradeId)){
+                currentTradingDeal = tradingDeal;
+            }
+        }
+
+        for(Card card : cards){
+            if(card.getId().equals(cardId)){
+                selectedCard = card;
+            }
+        }
+
+        if(currentTradingDeal == null){
+            throw new TradingDealNotFound("Trading Deal not found");
+        }
+
+        if(selectedCard == null){
+            throw new CardsNotFound("Card not found");
+        }
+
+
+        if(selectedCard.getDamage() > currentTradingDeal.getMinimumDamage()){
+            // check if card fits spell constraints for chosen TradeDeal
+            if(currentTradingDeal.getType().getName().equals("spell") && selectedCard.getName().contains("spell")){
+                // check if chosen card fits constraints for current tradingDeal
+                Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(selectedCard, cards, currentTradingDeal, openTradingDeals);
+                if(updatedTradingDeal.isPresent()){
+                    return updatedTradingDeal.get();
+                }
+            }
+
+            // check if card fits monster constraints for chosen TradeDeal
+            if(openTradingDeals.get(i).getType().getName().equals("monster") && !card.getName().contains("spell")){
+                // check if chosen card fits constraints for current tradingDeal
+                Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(card, cards, tradingDeal, openTradingDeals, i);
+                if(updatedTradingDeal.isPresent()){
+                    return updatedTradingDeal.get();
                 }
             }
         }
+
         throw new CardsNotFound("No open Trade Deal with the requested card type and damage found");
     }
 
-    public Optional<TradingDeal> checkForRequirementsAndExecuteUpdating(Card card, List<Card> cards, TradingDeal tradingDeal, List<TradingDeal> openTradingDeals, int i){
-        if(tradingDeal.getType().getName().equals("spell") && cards.get(i).getName().contains("spell")){
-            if(cards.get(i).getOwnerUuid().equals(card.getOwnerUuid())){
-                throw new NotAuthorized("You cannot trade with yourself");
-            }
-
-            updateCards(card, cards.get(i));
-            return Optional.of(updateTradingDeal(tradingDeal, openTradingDeals.get(i)));
+    public Optional<TradingDeal> checkForRequirementsAndExecuteUpdating(Card card, TradingDeal tradingDeal, User user){
+        if(card.getOwnerUuid().equals(user.getUuid())){
+            throw new NotAuthorized("You cannot trade with yourself");
         }
 
-        if(tradingDeal.getType().getName().equals("monster") && !cards.get(i).getName().contains("spell")){
-            if(cards.get(i).getOwnerUuid().equals(card.getOwnerUuid())){
-                throw new NotAuthorized("You cannot trade with yourself");
-            }
-
-            updateCards(card, cards.get(i));
-            return Optional.of(updateTradingDeal(tradingDeal, openTradingDeals.get(i)));
-        }
-
-        return Optional.empty();
+        updateCards(card, cards.get(i));
+        return Optional.of(updateTradingDeal(tradingDeal, openTradingDeals.get(i)));
     }
 
     public List<TradingDeal> deleteTradeDeals(String auth, String tradeId){
@@ -130,3 +138,4 @@ public class TradeService {
         throw(new NotAuthorized("This card has not been traded by this user"));
     }
 }
+

@@ -22,6 +22,8 @@ public class TradeController extends Controller {
     public Response handle(Request request) {
         if(request.getMethod().equals(Method.GET)){
             return getTradeDeals(request);
+        } else if(request.getMethod().equals(Method.POST) && request.getPath().contains("/tradings/")){
+            return trade(request);
         } else if(request.getMethod().equals(Method.POST)){
             return createTradeDeal(request);
         } else if (request.getMethod().equals(Method.DELETE)){
@@ -49,6 +51,25 @@ public class TradeController extends Controller {
             TradingDeal tradingDeal = fromBody(request.getBody(), TradingDeal.class);
             tradingDeal = tradeService.createTradeDeal(auth, tradingDeal);
             return json(Status.CREATED, tradingDeal);
+        } catch(UserNotFound e){
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(MissingAuthorizationHeader | CardIsPartOfDeck | CardsNotFound | CardNotOwned e){
+            return json(Status.BAD_REQUEST, new ErrorResponse(e.getMessage()));
+        } catch (NotAuthorized e){
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
+        } catch(Exception e){
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
+        }
+    }
+
+    private Response trade(Request request) {
+        try {
+            String auth = getAuthorizationToken(request);
+            String[] tradePath = request.getPath().split("/");
+            String tradeId = tradePath[tradePath.length - 1];
+            String cardId = request.getBody();
+            List<TradingDeal> tradingDeals = tradeService.trade(auth, tradeId, cardId);
+            return json(Status.OK, tradingDeals);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(MissingAuthorizationHeader | CardIsPartOfDeck | CardsNotFound | CardNotOwned e){
