@@ -56,7 +56,7 @@ public class MonsterTradingCardsApplication implements Application {
         ScoreboardService scoreboardService = new ScoreboardService(userRepository);
         BattleService battleService = new BattleService(userRepository, cardRepository, userService, cardService);
         TradeRepository tradeRepository = new TradeDbRepository(connectionPool);
-        TradeService tradeService = new TradeService(userService, tradeRepository, cardService);
+        TradeService tradeService = new TradeService(tradeRepository, userService,cardService);
 
         this.router.addRoute("/cards", new CardsController(cardService, userService));
         this.router.addRoute("/deck", new DeckController(deckService));

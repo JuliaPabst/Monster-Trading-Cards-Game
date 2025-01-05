@@ -25,7 +25,7 @@ public class TradeController extends Controller {
         } else if(request.getMethod().equals(Method.POST)){
             return createTradeDeal(request);
         } else if (request.getMethod().equals(Method.DELETE)){
-//            return deleteTradeDeal(request);
+            return deleteTradeDeal(request);
         }
 
         return json(Status.INTERNAL_SERVER_ERROR, "Internal Server Error");
@@ -60,21 +60,21 @@ public class TradeController extends Controller {
         }
     }
 
-//    private Response deleteTradeDeal(Request request) {
-//        try {
-//            String auth = getAuthorizationToken(request);
-//            String[] tradePath = request.getPath().split("/");
-//            String tradeId = tradePath[tradePath.length - 1];
-//            List<TradeDTO> tradeDTOs = tradeService.deleteTradeDeals(auth, tradeId);
-//            return json(Status.NO_CONTENT, tradeDTOs);
-//        } catch(UserNotFound e){
-//            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
-//        } catch(MissingAuthorizationHeader | CardsNotFound | CardNotOwned e){
-//            return json(Status.BAD_REQUEST, new ErrorResponse(e.getMessage()));
-//        } catch(NotAuthorized e){
-//            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
-//        } catch(Exception e){
-//            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
-//        }
-//    }
+    private Response deleteTradeDeal(Request request) {
+        try {
+            String auth = getAuthorizationToken(request);
+            String[] tradePath = request.getPath().split("/");
+            String tradeId = tradePath[tradePath.length - 1];
+            List<TradingDeal> tradingDeals = tradeService.deleteTradeDeals(auth, tradeId);
+            return json(Status.OK, tradingDeals);
+        } catch(UserNotFound e){
+            return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
+        } catch(MissingAuthorizationHeader | CardsNotFound | CardNotOwned e){
+            return json(Status.BAD_REQUEST, new ErrorResponse(e.getMessage()));
+        } catch(NotAuthorized e){
+            return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
+        } catch(Exception e){
+            return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
+        }
+    }
 }
