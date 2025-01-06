@@ -22,7 +22,6 @@ public class CardDbRepository implements CardRepository {
     private final static String CARDS_BELONGING_TO_DECK = "SELECT * from cards where deck_owner_uuid = ?";
     private final static String CARDS_BELONGING_TO_USER = "SELECT * FROM cards WHERE owner_uuid = ?";
     private final static String CARDS_NOT_BELONGING_TO_ANY_USER = "SELECT * FROM cards WHERE owner_uuid is NULL";
-    private final static String CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE = "SELECT c.* FROM cards c JOIN packages p ON c.package_id = p.id WHERE p.owner_uuid != ? AND c.damage > ?";
     private final static String CARDS_BELONGING_TO_CARD_ID = "SELECT * from cards where id = ?";
     private final static String UPDATED_CARD = "UPDATE cards SET owner_uuid = ?, deck_owner_uuid = ? where id = ?";
     private final ConnectionPool connectionPool;
@@ -53,7 +52,7 @@ public class CardDbRepository implements CardRepository {
         List<Optional<Card>> cards = new ArrayList<>();
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(ALL_CARDS);
+                PreparedStatement preparedStatement = connection.prepareStatement(ALL_CARDS)
         ) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -73,7 +72,7 @@ public class CardDbRepository implements CardRepository {
 
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_DECK);
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_DECK)
         ) {
             preparedStatement.setString(1, user.getUuid());
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -92,7 +91,7 @@ public class CardDbRepository implements CardRepository {
     public List<Card> findCardsByUserUuid(User user){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_USER);
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_USER)
         ) {
             List<Card> cards = new ArrayList<>();
             preparedStatement.setString(1, user.getUuid());
@@ -113,31 +112,9 @@ public class CardDbRepository implements CardRepository {
     public List<Card> findCardsNotBelongingToAnyUser(User user){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_NOT_BELONGING_TO_ANY_USER);
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_NOT_BELONGING_TO_ANY_USER)
         ) {
             List<Card> cards = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_owner_uuid"));
-                cards.add(card);
-            }
-
-            return cards;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Card> findCardsNotOwnedByUserWithDamage(User user, TradingDeal tradingDeal){
-        try (
-                Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_NOT_BELONGING_TO_USER_WITH_DAMAGE);
-        ) {
-            List<Card> cards = new ArrayList<>();
-            preparedStatement.setString(1, user.getUuid());
-            preparedStatement.setFloat(2, tradingDeal.getMinimumDamage());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Card card = new Card(resultSet.getString("id"), resultSet.getString("name"), resultSet.getFloat("damage"), resultSet.getString("owner_uuid"), resultSet.getString("deck_owner_uuid"));
@@ -156,8 +133,8 @@ public class CardDbRepository implements CardRepository {
 
         for(String id : ids){
             try (
-                    Connection connection = connectionPool.getConnection();
-                    PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_CARD_ID);
+                Connection connection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_CARD_ID)
             ) {
                 System.out.println("Querying cards for ID: " + id);
                 preparedStatement.setString(1, id);
@@ -172,17 +149,20 @@ public class CardDbRepository implements CardRepository {
             }
         }
 
+        System.out.println(cards);
+        System.out.println("card size: " + cards.size());
+        System.out.println("id size: " + ids.size());
         if (cards.size() == ids.size()) {
             return cards;
         }
 
-        throw new CardsNotFound("No cards belonging to the provided ids");
+        throw new CardsNotFound("No cards belonging to the provided ids repo");
     }
 
     public Card updateCard(Card card){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD);
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD)
         ) {
             preparedStatement.setString(1, card.getOwnerUuid());
             preparedStatement.setString(2, card.getDeckUserId());
@@ -200,7 +180,7 @@ public class CardDbRepository implements CardRepository {
     public List<Card> updateDeckUserId(List<Card> cards){
         try (
                 Connection connection = connectionPool.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD);
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATED_CARD)
         ) {
             for(Card card : cards){
                 preparedStatement.setString(1, card.getOwnerUuid());

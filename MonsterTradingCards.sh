@@ -19,7 +19,7 @@ done
 
 if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
-## --------------------------------------------------
+# --------------------------------------------------
 #echo "1) Create Users (Registration)"
 ## Create User
 #curl -i -X POST http://localhost:10001/users --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
@@ -45,27 +45,27 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #
 #if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
-## --------------------------------------------------
-#echo "2) Login Users"
-#curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
-#echo "should return HTTP 200 with generated token for the user, here: kienboec-mtcgToken"
-#echo .
-#curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"altenhof\", \"Password\":\"markus\"}"
-#echo "should return HTTP 200 with generated token for the user, here: altenhof-mtcgToken"
-#echo .
-#curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"admin\",    \"Password\":\"istrator\"}"
-#echo "should return HTTP 200 with generated token for the user, here: admin-mtcgToken"
-#echo .
-#
-#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
-#
-#echo "should fail:"
-#curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"different\"}"
-#echo "Should return HTTP 4xx - Login failed"
-#echo .
-#echo .
-#
-#if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+# --------------------------------------------------
+echo "2) Login Users"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"daniel\"}"
+echo "should return HTTP 200 with generated token for the user, here: kienboec-mtcgToken"
+echo .
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"altenhof\", \"Password\":\"markus\"}"
+echo "should return HTTP 200 with generated token for the user, here: altenhof-mtcgToken"
+echo .
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"admin\",    \"Password\":\"istrator\"}"
+echo "should return HTTP 200 with generated token for the user, here: admin-mtcgToken"
+echo .
+
+if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
+
+echo "should fail:"
+curl -i -X POST http://localhost:10001/sessions --header "Content-Type: application/json" -d "{\"Username\":\"kienboec\", \"Password\":\"different\"}"
+echo "Should return HTTP 4xx - Login failed"
+echo .
+echo .
+
+if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 
 ### --------------------------------------------------
 #echo "3) create packages (done by admin)"
@@ -351,7 +351,7 @@ if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #
 # --------------------------------------------------
-echo "20) trade"
+#echo "20) trade"
 #echo "check trading deals"
 #curl -i -X GET http://localhost:10001/tradings --header "Authorization: Bearer kienboec-mtcgToken"
 #echo "Should return HTTP 200 - and an empty list"
@@ -405,11 +405,11 @@ echo "20) trade"
 #
 #if [ $pauseFlag -eq 1 ]; then read -p "Press enter to continue..."; fi
 #
-echo "try to trade"
-echo .
-curl -i -X POST http://localhost:10001/tradings/6cd85277-4590-49d4-b0cf-ba0a921faad0 --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "\"951e886a-0fbf-425d-8df5-af2ee4830d85\""
-echo "Should return HTTP 201 ..."
-echo .
+#echo "try to trade"
+#echo .
+#curl -i -X POST http://localhost:10001/tradings/6cd85277-4590-49d4-b0cf-ba0a921faad0 --header "Content-Type: application/json" --header "Authorization: Bearer altenhof-mtcgToken" -d "\"951e886a-0fbf-425d-8df5-af2ee4830d85\""
+#echo "Should return HTTP 201 ..."
+#echo .
 #curl -i -X GET http://localhost:10001/tradings --header "Authorization: Bearer kienboec-mtcgToken"
 #echo "Should return HTTP 200 ..."
 #echo .

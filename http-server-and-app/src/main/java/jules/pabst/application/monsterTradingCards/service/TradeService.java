@@ -6,6 +6,7 @@ import jules.pabst.application.monsterTradingCards.entity.User;
 import jules.pabst.application.monsterTradingCards.exception.CardsNotFound;
 import jules.pabst.application.monsterTradingCards.exception.NotAuthorized;
 import jules.pabst.application.monsterTradingCards.exception.TradingDealNotFound;
+import jules.pabst.application.monsterTradingCards.exception.TradingDealRequirementsNotMet;
 import jules.pabst.application.monsterTradingCards.repository.TradeRepository;
 
 import java.util.ArrayList;
@@ -28,6 +29,78 @@ public class TradeService {
         return tradeRepository.findAllTradingDeals();
     }
 
+    public TradingDeal createTradeDeal(String auth, TradingDeal tradingDeal){
+        User user = userService.getUserByAuthenticationToken(auth);
+        cardService.checkIfCardIsOwnedByTraderAndIsNotInDeck(user, tradingDeal);
+
+        tradeRepository.save(tradingDeal);
+
+        return tradingDeal;
+    }
+
+    public TradingDeal trade(String auth, String tradeId, String cardId){
+        User user = userService.getUserByAuthenticationToken(auth);
+        List<TradingDeal> openTradingDeals = tradeRepository.findAllOpenTradingDeals();
+
+        Optional<Card> cardToTrade = cardService.findCardById(cardId);
+        if(cardToTrade.isEmpty()){
+            throw new CardsNotFound("Card to trade with not found");
+        }
+
+        TradingDeal currentTradingDeal = null;
+        Optional<Card> tradingDealCard;
+
+        for(TradingDeal tradingDeal : openTradingDeals){
+            if(tradingDeal.getId().equals(tradeId)){
+                currentTradingDeal = tradingDeal;
+            }
+        }
+
+        tradingDealCard = cardService.findCardById(currentTradingDeal.getCardToTrade());
+        if(tradingDealCard.isEmpty()){
+            throw new CardsNotFound("Trading deal card not found");
+        }
+
+        verifyTradeDealData(currentTradingDeal, tradingDealCard.get());
+
+        return checkForRequirementsAndExecuteUpdating(tradingDealCard.get(), cardToTrade.get(), currentTradingDeal, user);
+    }
+
+    private void verifyTradeDealData(TradingDeal currentTradingDeal, Card tradingDealCard){
+        if(currentTradingDeal == null){
+            throw new TradingDealNotFound("Trading Deal not found");
+        }
+
+        if(tradingDealCard == null){
+            throw new CardsNotFound("Trading Deal Card not found");
+        }
+    }
+
+    private TradingDeal checkForRequirementsAndExecuteUpdating(Card tradingDealCard, Card cardToTradeWith, TradingDeal currentTradingDeal, User user) {
+        if (cardToTradeWith.getOwnerUuid().equals(user.getUuid())) {
+            throw new NotAuthorized("You cannot trade with yourself");
+        }
+
+        if (currentTradingDeal.getTradeStatus().getName().equals("completed")) {
+            throw new TradingDealNotFound("Trading Deal already completed in another trade");
+        }
+
+        if (cardToTradeWith.getDamage() > currentTradingDeal.getMinimumDamage()) {
+            // check if card fits spell constraints for chosen TradeDeal
+            if (currentTradingDeal.getType().getName().equals("spell") && cardToTradeWith.getName().contains("spell")) {
+                updateCards(tradingDealCard, cardToTradeWith);
+                return updateTradingDeal(currentTradingDeal);
+            }
+
+            // check if card fits monster constraints for chosen TradeDeal
+            if (currentTradingDeal.getType().getName().equals("monster") && !cardToTradeWith.getName().contains("spell")) {
+                updateCards(tradingDealCard, cardToTradeWith);
+                return updateTradingDeal(currentTradingDeal);
+            }
+        }
+        throw new TradingDealRequirementsNotMet("Selected Card to trade does not fulfill the requirements of the selected trading deal");
+    }
+
     private void updateCards(Card card1, Card card2){
         List<Card> cardsToUpdate = new ArrayList<>();
         String idTrader1 = card1.getOwnerUuid();
@@ -40,81 +113,10 @@ public class TradeService {
         cardService.updateCards(cardsToUpdate);
     }
 
-    private TradingDeal updateTradingDeal(TradingDeal tradingDeal1, TradingDeal tradingDeal2){
-        tradingDeal1.setTradeStatus("completed");
-        tradingDeal2.setTradeStatus("completed");
+    private TradingDeal updateTradingDeal(TradingDeal currentTradingDeal){
+        currentTradingDeal.setTradeStatus("completed");
 
-        tradeRepository.updateTradeDealStatus(tradingDeal2);
-        return tradeRepository.updateTradeDealStatus(tradingDeal1);
-    }
-
-    public TradingDeal createTradeDeal(String auth, TradingDeal tradingDeal){
-        User user = userService.getUserByAuthenticationToken(auth);
-        Card card = cardService.checkIfCardIsOwnedByTraderAndIsNotInDeck(user, tradingDeal);
-
-        tradeRepository.save(tradingDeal);
-
-        return tradingDeal;
-    }
-
-    public TradingDeal trade(String auth, String tradeId, String cardId){
-        User user = userService.getUserByAuthenticationToken(auth);
-        List<TradingDeal> openTradingDeals = tradeRepository.findAllOpenTradingDeals();
-        List<Card> cards = cardService.findCardsById(openTradingDeals);
-        TradingDeal currentTradingDeal = null;
-        Card selectedCard = null;
-
-        for(TradingDeal tradingDeal : openTradingDeals){
-            if(tradingDeal.getId().equals(tradeId)){
-                currentTradingDeal = tradingDeal;
-            }
-        }
-
-        for(Card card : cards){
-            if(card.getId().equals(cardId)){
-                selectedCard = card;
-            }
-        }
-
-        if(currentTradingDeal == null){
-            throw new TradingDealNotFound("Trading Deal not found");
-        }
-
-        if(selectedCard == null){
-            throw new CardsNotFound("Card not found");
-        }
-
-
-        if(selectedCard.getDamage() > currentTradingDeal.getMinimumDamage()){
-            // check if card fits spell constraints for chosen TradeDeal
-            if(currentTradingDeal.getType().getName().equals("spell") && selectedCard.getName().contains("spell")){
-                // check if chosen card fits constraints for current tradingDeal
-                Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(selectedCard, cards, currentTradingDeal, openTradingDeals);
-                if(updatedTradingDeal.isPresent()){
-                    return updatedTradingDeal.get();
-                }
-            }
-
-            // check if card fits monster constraints for chosen TradeDeal
-            if(openTradingDeals.get(i).getType().getName().equals("monster") && !card.getName().contains("spell")){
-                // check if chosen card fits constraints for current tradingDeal
-                Optional<TradingDeal> updatedTradingDeal = checkForRequirementsAndExecuteUpdating(card, cards, tradingDeal, openTradingDeals, i);
-                if(updatedTradingDeal.isPresent()){
-                    return updatedTradingDeal.get();
-                }
-            }
-        }
-
-        throw new CardsNotFound("No open Trade Deal with the requested card type and damage found");
-    }
-
-    public Optional<TradingDeal> checkForRequirementsAndExecuteUpdating(Card card, TradingDeal tradingDeal, User user){
-        if(card.getOwnerUuid().equals(user.getUuid())){
-            throw new NotAuthorized("You cannot trade with yourself");
-        }
-
-        updateCards(card, cards.get(i));
-        return Optional.of(updateTradingDeal(tradingDeal, openTradingDeals.get(i)));
+        return tradeRepository.updateTradeDealStatus(currentTradingDeal);
     }
 
     public List<TradingDeal> deleteTradeDeals(String auth, String tradeId){
@@ -123,7 +125,7 @@ public class TradeService {
 
         for(int i = 0; i < openTradingDeals.size(); i++){
             if(openTradingDeals.get(i).getId().equals(tradeId)){
-                List<Card> cards = cardService.findCardsById(openTradingDeals);
+                List<Card> cards = cardService.findCardsByTradingId(openTradingDeals);
 
                 if(cards.getFirst().getOwnerUuid().equals(user.getUuid())){
                     tradeRepository.delete(tradeId);
@@ -134,7 +136,6 @@ public class TradeService {
                 throw new NotAuthorized("Trading Deal does not belong to user");
             }
         }
-
         throw(new NotAuthorized("This card has not been traded by this user"));
     }
 }

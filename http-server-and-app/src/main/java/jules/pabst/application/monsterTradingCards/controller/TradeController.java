@@ -68,15 +68,17 @@ public class TradeController extends Controller {
             String[] tradePath = request.getPath().split("/");
             String tradeId = tradePath[tradePath.length - 1];
             String cardId = request.getBody();
-            List<TradingDeal> tradingDeals = tradeService.trade(auth, tradeId, cardId);
+            String[] cardIdWithoutQuotationMarks = cardId.split("\"");
+            TradingDeal tradingDeals = tradeService.trade(auth, tradeId, cardIdWithoutQuotationMarks[1]);
             return json(Status.OK, tradingDeals);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
-        } catch(MissingAuthorizationHeader | CardIsPartOfDeck | CardsNotFound | CardNotOwned e){
+        } catch(MissingAuthorizationHeader | CardIsPartOfDeck | CardsNotFound | CardNotOwned |
+                TradingDealRequirementsNotMet e){
             return json(Status.BAD_REQUEST, new ErrorResponse(e.getMessage()));
         } catch (NotAuthorized e){
             return json(Status.UNAUTHORIZED, new ErrorResponse(e.getMessage()));
-        } catch(Exception e){
+        } catch (Exception e){
             return json(Status.INTERNAL_SERVER_ERROR, new ErrorResponse(e.getMessage()));
         }
     }

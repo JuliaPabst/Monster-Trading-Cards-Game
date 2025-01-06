@@ -92,9 +92,6 @@ public class CardService {
 
     public Card checkIfCardIsOwnedByTraderAndIsNotInDeck(User user, TradingDeal tradingDeal){
         List<Card> cards = cardRepository.findCardsByUserUuid(user);
-        if (cards.isEmpty()) {
-            throw new CardsNotFound("No cards belonging to the provided user");
-        }
 
         for(Card card : cards) {
             System.out.println("Current card id: " + card.getId());
@@ -110,22 +107,6 @@ public class CardService {
         throw new NotAuthorized("Card does not belong to the user");
     }
 
-//    public Optional<Card> readCardNotOwnedByTraderWithDamage(User user, TradingDeal tradingDeal){
-//        List<Card> cards = cardRepository.findCardsNotOwnedByUserWithDamage(user, tradingDeal);
-//        if (cards.isEmpty()) {
-//            throw new CardsNotFound("No cards that have a damage bigger than the requested damage and that don't belong to the trader");
-//        }
-//
-//        for(Card card : cards) {
-//            System.out.println("Current card name: " + card.getName());
-//            if(card.getDeckUserId() == null) {
-//               return Optional.of(card);
-//            }
-//        }
-//
-//
-//    }
-
     public Card updateDeckuserId(Card card){
         card = cardRepository.updateCard(card);
         return card;
@@ -140,11 +121,23 @@ public class CardService {
         return updatedCards;
     }
 
-    public List<Card> findCardsById(List<TradingDeal> tradingDeals){
+    public List<Card> findCardsByTradingId(List<TradingDeal> tradingDeals){
         List<String> ids = new ArrayList<>();
         for(TradingDeal tradingDeal : tradingDeals){
             ids.add(tradingDeal.getCardToTrade());
         }
         return cardRepository.findCardsById(ids);
+    }
+
+    public Optional<Card> findCardById(String cardId){
+        List<String> ids = new ArrayList<>();
+        ids.add(cardId);
+        List<Card> card = cardRepository.findCardsById(ids);
+
+        if(card.isEmpty()){
+            return Optional.empty();
+        }
+
+        return Optional.of(card.get(0));
     }
 }
