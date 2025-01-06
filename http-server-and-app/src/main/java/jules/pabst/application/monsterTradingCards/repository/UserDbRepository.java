@@ -75,12 +75,9 @@ public class UserDbRepository implements UserRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_USERNAME)
         ) {
-            System.out.println("name in findUserByName:'%s'".formatted(name));
             preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                System.out.println("Result set token finduserByName: " + resultSet.getString("token"));
-                System.out.println("Result set username finduserByName: " + resultSet.getString("username"));
                 return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit")));
             }
         } catch (SQLException e) {
@@ -97,12 +94,9 @@ public class UserDbRepository implements UserRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(FIND_USER_BY_TOKEN)
         ) {
-            System.out.println("authenticationtoken in findUserByAuthentication:'%s'".formatted(authenticationToken));
             preparedStatement.setString(1, authenticationToken);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                System.out.println("Result set token findUserByAuthentication: " + resultSet.getString("token"));
-                System.out.println("Result set username findUserByAuthentication: " + resultSet.getString("username"));
                 return Optional.of(new User(resultSet.getString("uuid"), resultSet.getString("username"), resultSet.getString("password"), resultSet.getString("bio"), resultSet.getString("image"), resultSet.getInt("elo"), resultSet.getInt("wins"), resultSet.getInt("losses"), resultSet.getString("token"), resultSet.getInt("credit")));
             }
         } catch (SQLException e) {
@@ -155,7 +149,6 @@ public class UserDbRepository implements UserRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USER_BY_UUID)
         ) {
-            System.out.println("Username: %s".formatted(user.getUsername()));
             preparedStatement.setString(1, user.getUsername());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getBio());
@@ -179,8 +172,6 @@ public class UserDbRepository implements UserRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_USERDATA_BY_USERNAME)
         ) {
-            System.out.println("Username UserDTO: %s".formatted(userDTO.getUsername()));
-            System.out.println("Username Original:" + originalUsername);
             preparedStatement.setString(1, userDTO.getUsername());
             preparedStatement.setString(2, userDTO.getBio());
             preparedStatement.setString(3, userDTO.getImage());

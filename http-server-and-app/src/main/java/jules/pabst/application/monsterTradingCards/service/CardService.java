@@ -43,9 +43,6 @@ public class CardService {
             throw new NotNull("Card name cannot be null");
         }
 
-        System.out.println("This is one card being created" + card.getName());
-        System.out.println("This is the id: " + card.getId());
-
         card = cardRepository.save(card);
 
         return card;
@@ -66,7 +63,6 @@ public class CardService {
 
     public List<Card> checkCreditAndAquire(String authtoken){
         User user = userService.getUserByAuthenticationToken(authtoken);
-        System.out.println("User credit: %d".formatted(user.getCredit()));
         if(user.getCredit()>=5){
             List<Card> cardsToAquire = new ArrayList<>();
             List<Card> cardsWithoutOwner = cardRepository.findCardsNotBelongingToAnyUser(user);
@@ -94,8 +90,6 @@ public class CardService {
         List<Card> cards = cardRepository.findCardsByUserUuid(user);
 
         for(Card card : cards) {
-            System.out.println("Current card id: " + card.getId());
-            System.out.println("Trading deal id: " + tradingDeal.getCardToTrade());
             if(card.getId().equals(tradingDeal.getCardToTrade())){
                if(card.getDeckUserId() == null){
                    return card;

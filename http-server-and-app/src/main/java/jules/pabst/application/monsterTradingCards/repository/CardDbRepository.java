@@ -36,7 +36,6 @@ public class CardDbRepository implements CardRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(NEW_CARD)
         ) {
-            System.out.println("I am creating a card!");
             preparedStatement.setString(1, card.getId());
             preparedStatement.setString(2, card.getName());
             preparedStatement.setFloat(3, card.getDamage());
@@ -136,7 +135,6 @@ public class CardDbRepository implements CardRepository {
                 Connection connection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(CARDS_BELONGING_TO_CARD_ID)
             ) {
-                System.out.println("Querying cards for ID: " + id);
                 preparedStatement.setString(1, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
@@ -149,10 +147,7 @@ public class CardDbRepository implements CardRepository {
             }
         }
 
-        System.out.println(cards);
-        System.out.println("card size: " + cards.size());
-        System.out.println("id size: " + ids.size());
-        if (cards.size() == ids.size()) {
+         if (cards.size() == ids.size()) {
             return cards;
         }
 
@@ -168,8 +163,6 @@ public class CardDbRepository implements CardRepository {
             preparedStatement.setString(2, card.getDeckUserId());
             preparedStatement.setString(3, card.getId());
             preparedStatement.execute();
-            System.out.println("Updated card: " + card.getId());
-
             return card;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -187,7 +180,6 @@ public class CardDbRepository implements CardRepository {
                 preparedStatement.setString(2, card.getDeckUserId());
                 preparedStatement.setString(3, card.getId());
                 preparedStatement.execute();
-                System.out.println("Updated card: " + card.getId());
             }
 
             return cards;

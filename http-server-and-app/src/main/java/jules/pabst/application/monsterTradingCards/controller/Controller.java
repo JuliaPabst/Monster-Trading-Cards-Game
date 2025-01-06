@@ -38,7 +38,6 @@ public abstract class Controller {
 
     protected <T> T arrayFromBody(String body, TypeReference<T> typeReference) {
         try {
-            System.out.println("Body: " + body);
             return objectMapper.readValue(body, typeReference);
         } catch (JsonProcessingException e) {
             throw new InvalidBodyException(e);
@@ -48,7 +47,6 @@ public abstract class Controller {
     protected String getAuthorizationToken(Request request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || authHeader.isEmpty()) {
-            System.out.println("Authorization header: " + authHeader);
             throw new MissingAuthorizationHeader("Authorization header is missing");
         }
 

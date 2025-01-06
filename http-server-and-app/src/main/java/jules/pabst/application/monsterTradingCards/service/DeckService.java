@@ -52,7 +52,6 @@ public class DeckService {
             }
 
             card.setDeckUserId(user.getUuid());
-            System.out.println("Deck user id set:" + card.getDeckUserId());
         }
 
         return cardRepository.updateDeckUserId(cards);

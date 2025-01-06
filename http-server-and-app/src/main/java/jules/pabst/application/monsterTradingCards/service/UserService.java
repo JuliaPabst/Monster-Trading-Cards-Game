@@ -83,10 +83,6 @@ public class UserService {
         if (authenticationToken.contains(pathName)) {
             Optional<User> originalUser = userRepository.findUserByAuthenticationToken(authenticationToken);
             if (originalUser.isPresent()) {
-                System.out.println("Authentication Token: " + authenticationToken);
-                System.out.println("Original User: Token: " + originalUser.get().getToken());
-
-                System.out.println("Authentication token equal to each other");
                 UserDTO userDTO = new UserDTO(
                         originalUser.get().getUuid(),
                         originalUser.get().getUsername(),

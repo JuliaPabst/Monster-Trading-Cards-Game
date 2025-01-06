@@ -46,7 +46,6 @@ public class BattlesController extends Controller {
 
             try {
                 String battleLog = futureBattleLog.get();
-                System.out.println(battleLog);
                 return json(Status.OK, battleLog);
             } catch (Exception e) {
                 e.printStackTrace();
