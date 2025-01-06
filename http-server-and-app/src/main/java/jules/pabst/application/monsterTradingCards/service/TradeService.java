@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Optional.empty;
+
 public class TradeService {
     TradeRepository tradeRepository;
     UserService userService;
@@ -42,42 +44,34 @@ public class TradeService {
         User user = userService.getUserByAuthenticationToken(auth);
         List<TradingDeal> openTradingDeals = tradeRepository.findAllOpenTradingDeals();
 
+        if(openTradingDeals.isEmpty()){
+            throw new TradingDealNotFound("There are no open trading deals");
+        }
+
+        Optional<TradingDeal> currentTradingDeal = Optional.empty();
+
+        for(TradingDeal tradingDeal : openTradingDeals){
+            if(tradingDeal.getId().equals(tradeId)){
+                currentTradingDeal = Optional.of(tradingDeal);
+            }
+        }
+
+        if(currentTradingDeal.isEmpty()){
+            throw new TradingDealNotFound("Selected trading deal not available");
+        }
+
+        Optional<Card> tradingDealCard = Optional.empty();
+        tradingDealCard = cardService.findCardById(currentTradingDeal.get().getCardToTrade());
+        if(tradingDealCard.isEmpty()){
+            throw new CardsNotFound("Trading deal card not found");
+        }
+
         Optional<Card> cardToTrade = cardService.findCardById(cardId);
         if(cardToTrade.isEmpty()){
             throw new CardsNotFound("Card to trade with not found");
         }
 
-        TradingDeal currentTradingDeal = null;
-        Optional<Card> tradingDealCard;
-
-        for(TradingDeal tradingDeal : openTradingDeals){
-            if(tradingDeal.getId().equals(tradeId)){
-                currentTradingDeal = tradingDeal;
-            }
-        }
-
-        if(currentTradingDeal == null){
-            throw new TradingDealNotFound("No open Trading Deals available");
-        }
-
-        tradingDealCard = cardService.findCardById(currentTradingDeal.getCardToTrade());
-        if(tradingDealCard.isEmpty()){
-            throw new CardsNotFound("Trading deal card not found");
-        }
-
-        verifyTradeDealData(currentTradingDeal, tradingDealCard.get());
-
-        return checkForRequirementsAndExecuteUpdating(tradingDealCard.get(), cardToTrade.get(), currentTradingDeal, user);
-    }
-
-    private void verifyTradeDealData(TradingDeal currentTradingDeal, Card tradingDealCard){
-        if(currentTradingDeal == null){
-            throw new TradingDealNotFound("Trading Deal not found");
-        }
-
-        if(tradingDealCard == null){
-            throw new CardsNotFound("Trading Deal Card not found");
-        }
+        return checkForRequirementsAndExecuteUpdating(tradingDealCard.get(), cardToTrade.get(), currentTradingDeal.get(), user);
     }
 
     private TradingDeal checkForRequirementsAndExecuteUpdating(Card tradingDealCard, Card cardToTradeWith, TradingDeal currentTradingDeal, User user) {
