@@ -70,7 +70,7 @@ public class UsersController extends Controller {
             String authenticationToken = getAuthorizationToken(request);
             UserUpdateDTO user = fromBody(request.getBody(), UserUpdateDTO.class);
             UserDTO userDTO = userService.updateUserDataByUserName(user, authenticationToken, pathName);
-            return json(Status.OK, userDTO);
+            return json(Status.CREATED, userDTO);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(MissingAuthorizationHeader | InvalidUserCredentials e){

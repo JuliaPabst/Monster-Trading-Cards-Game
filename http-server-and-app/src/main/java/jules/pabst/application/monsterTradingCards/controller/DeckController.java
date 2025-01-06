@@ -67,7 +67,7 @@ public class DeckController extends Controller {
             String authenticationToken = getAuthorizationToken(request);
             List<String> cardIds =  arrayFromBody(request.getBody(), new TypeReference<List<String>>() {});
             List<Card> cards = deckService.configureDeck(authenticationToken, cardIds);
-            return json(Status.OK, cards);
+            return json(Status.CREATED, cards);
         } catch(UserNotFound | CardsNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(NotRightAmountOfCards | CardNotOwned e){

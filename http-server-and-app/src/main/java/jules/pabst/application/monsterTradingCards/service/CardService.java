@@ -71,7 +71,7 @@ public class CardService {
             List<Card> cardsToAquire = new ArrayList<>();
             List<Card> cardsWithoutOwner = cardRepository.findCardsNotBelongingToAnyUser(user);
             if(cardsWithoutOwner.size() < 5){
-                throw new CardsNotFound("Not enough cards available");
+                throw new CardsNotFound("No package available");
             }
 
             for(int i = 0; i < 5; i++){
@@ -87,7 +87,7 @@ public class CardService {
             return cardsToAquire;
         }
 
-        throw(new NotEnoughCredit("Not enough credit"));
+        throw(new NotEnoughCredit("Not enough money"));
     }
 
     public Card checkIfCardIsOwnedByTraderAndIsNotInDeck(User user, TradingDeal tradingDeal){

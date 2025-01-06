@@ -20,11 +20,17 @@ public class ScoreboardService {
         List<ScoreboardDTO> scoreboard = new ArrayList<>();
         List<User> users = userRepository.findAllUsers();
 
+        users.sort(Comparator.comparingInt(User::getElo).reversed());
+
         if(!users.isEmpty()){
             int place = 0;
-            for (User user : users) {
-                place++;
-                ScoreboardDTO stats = new ScoreboardDTO(place, user.getUsername(), user.getElo(), user.getWins(), user.getLosses());
+            for (int i = 0; i < users.size(); i++) {
+                if(i != 0 && users.get(i).getElo() != users.get(i-1).getElo()){
+                    place++;
+                } else if(i == 0){
+                    place++;
+                }
+                ScoreboardDTO stats = new ScoreboardDTO(place, users.get(i).getUsername(), users.get(i).getElo(), users.get(i).getWins(), users.get(i).getLosses());
                 scoreboard.add(stats);
             }
 
