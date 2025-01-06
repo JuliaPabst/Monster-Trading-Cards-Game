@@ -70,7 +70,7 @@ public class TradeController extends Controller {
             String cardId = request.getBody();
             String[] cardIdWithoutQuotationMarks = cardId.split("\"");
             TradingDeal tradingDeals = tradeService.trade(auth, tradeId, cardIdWithoutQuotationMarks[1]);
-            return json(Status.OK, tradingDeals);
+            return json(Status.CREATED, tradingDeals);
         } catch(UserNotFound e){
             return json(Status.NOT_FOUND, new ErrorResponse(e.getMessage()));
         } catch(MissingAuthorizationHeader | CardIsPartOfDeck | CardsNotFound | CardNotOwned |

@@ -56,6 +56,10 @@ public class TradeService {
             }
         }
 
+        if(currentTradingDeal == null){
+            throw new TradingDealNotFound("No open Trading Deals available");
+        }
+
         tradingDealCard = cardService.findCardById(currentTradingDeal.getCardToTrade());
         if(tradingDealCard.isEmpty()){
             throw new CardsNotFound("Trading deal card not found");
@@ -77,6 +81,8 @@ public class TradeService {
     }
 
     private TradingDeal checkForRequirementsAndExecuteUpdating(Card tradingDealCard, Card cardToTradeWith, TradingDeal currentTradingDeal, User user) {
+        System.out.println("TradingDealCard " + tradingDealCard.getId());
+        System.out.println("cardToTradeWith " + cardToTradeWith.getId());
         if (cardToTradeWith.getOwnerUuid().equals(user.getUuid())) {
             throw new NotAuthorized("You cannot trade with yourself");
         }
