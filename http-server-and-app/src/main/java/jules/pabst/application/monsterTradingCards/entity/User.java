@@ -9,7 +9,7 @@ public class User {
     private String password;
     private String bio = "";
     private String image = "";
-    private int elo = 0;
+    private int elo = 100;
     private int wins = 0;
     private int losses = 0;
     private String token;

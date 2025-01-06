@@ -19,8 +19,7 @@ public class StatsService {
         Optional<User> user = userRepository.findUserByAuthenticationToken(authentificationToken);
 
         if(user.isPresent()) {
-            int elo = user.get().getWins()*3 - user.get().getLosses()*5;
-            return new StatsDTO(user.get().getUsername(), elo, user.get().getWins(), user.get().getLosses());
+            return new StatsDTO(user.get().getUsername(), user.get().getElo(), user.get().getWins(), user.get().getLosses());
         }
 
         throw new UserNotFound("User not found");

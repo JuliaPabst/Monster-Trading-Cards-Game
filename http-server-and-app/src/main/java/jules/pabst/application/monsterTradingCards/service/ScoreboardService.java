@@ -23,18 +23,15 @@ public class ScoreboardService {
         users.sort(Comparator.comparingInt(User::getElo).reversed());
 
         if(!users.isEmpty()){
-            int place = 0;
+            int place = 1;
             for (int i = 0; i < users.size(); i++) {
-                if(i != 0 && users.get(i).getElo() != users.get(i-1).getElo()){
-                    place++;
-                } else if(i == 0){
-                    place++;
+                // Increment place only if the current user has a different ELO
+                if (i > 0 && users.get(i).getElo() != users.get(i - 1).getElo()) {
+                    place = i + 1;
                 }
                 ScoreboardDTO stats = new ScoreboardDTO(place, users.get(i).getUsername(), users.get(i).getElo(), users.get(i).getWins(), users.get(i).getLosses());
                 scoreboard.add(stats);
             }
-
-            scoreboard.sort(Comparator.comparingInt(ScoreboardDTO::getElo));
         }
 
         return scoreboard;

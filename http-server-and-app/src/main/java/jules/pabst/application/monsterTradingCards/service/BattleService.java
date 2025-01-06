@@ -132,11 +132,11 @@ public class BattleService {
 
     private void updateElo(User winner, User loser, StringBuilder log) {
         int eloChange = 30;
-        winner.setElo(winner.getElo() + eloChange);
-        loser.setElo(loser.getElo() - eloChange);
 
         winner.setWins(winner.getWins() + 1);
         loser.setLosses(loser.getLosses() + 1);
+        winner.setElo(100 + (winner.getWins()*3 - winner.getLosses()*5));
+        loser.setElo(100 + (loser.getWins()*3 - loser.getLosses()*5));
 
         userRepository.updateUserByUuid(winner);
         userRepository.updateUserByUuid(loser);

@@ -61,7 +61,6 @@ public class DeckController extends Controller {
         }
     }
 
-
     public Response configureDeck(Request request) {
         try{
             String authenticationToken = getAuthorizationToken(request);
