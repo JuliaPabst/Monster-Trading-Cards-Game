@@ -10,7 +10,8 @@ public enum Status {
     PAYMENT_REQUIRED(402, "Payment Required"),
     NOT_FOUND(404, "Not Found"),
     CONFLICT(409, "Conflict"),
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error");
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    REQUEST_TIMEOUT(408, "Request Timeout");
 
     private final int code;
     private final String message;

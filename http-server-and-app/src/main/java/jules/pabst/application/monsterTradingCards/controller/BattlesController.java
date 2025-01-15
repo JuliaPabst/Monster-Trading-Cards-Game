@@ -1,21 +1,19 @@
 package jules.pabst.application.monsterTradingCards.controller;
 
-import jules.pabst.application.monsterTradingCards.DTOs.BattleDTO;
+import jules.pabst.application.monsterTradingCards.controller.Controller;
 import jules.pabst.application.monsterTradingCards.service.BattleService;
 import jules.pabst.server.http.Method;
 import jules.pabst.server.http.Request;
 import jules.pabst.server.http.Response;
 import jules.pabst.server.http.Status;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class BattlesController extends Controller {
     private final BattleService battleService;
-    private final ConcurrentHashMap<String, String> battleQueue = new ConcurrentHashMap<>();
-    private final ExecutorService executor = Executors.newCachedThreadPool();
+    private final BlockingQueue<String> playerQueue = new LinkedBlockingQueue<>();
 
     public BattlesController(BattleService battleService) {
         this.battleService = battleService;
@@ -30,28 +28,34 @@ public class BattlesController extends Controller {
         return json(Status.NOT_FOUND, "Endpoint not found");
     }
 
-    private synchronized Response handleBattleRequest(Request request) {
+    private Response handleBattleRequest(Request request) {
         String auth = getAuthorizationToken(request);
 
-        if (battleQueue.isEmpty()) {
-            battleQueue.put(auth, auth);
-            return json(Status.OK, "Waiting for an opponent...");
-        } else {
-            String opponentAuth = battleQueue.keys().nextElement();
-            battleQueue.remove(opponentAuth);
+        try {
+            // Attempt to pair with another player
+            String opponentAuth = playerQueue.poll(10, TimeUnit.SECONDS);
 
-            Future<String> futureBattleLog = executor.submit(() -> {
-                return battleService.battle(auth, opponentAuth);
-            });
+            if (opponentAuth == null) {
+                // No opponent found, add the current player to the queue and wait
+                playerQueue.put(auth);
+                opponentAuth = playerQueue.poll(10, TimeUnit.SECONDS);
 
-            try {
-                String battleLog = futureBattleLog.get();
-                return json(Status.OK, battleLog);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return json(Status.INTERNAL_SERVER_ERROR, "An error occurred while processing the battle.");
+                if (opponentAuth == null || opponentAuth.equals(auth)) {
+                    // Timeout or self-pairing occurred, clean up and notify the player
+                    playerQueue.remove(auth); // Ensure the current player is not left in the queue
+                    return json(Status.REQUEST_TIMEOUT, "No opponent found. Please try again later.");
+                }
             }
 
+            // Run the battle logic
+            String battleLog = battleService.battle(auth, opponentAuth);
+
+            // Respond with the battle log
+            return json(Status.OK, battleLog);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return json(Status.INTERNAL_SERVER_ERROR, "An error occurred while processing your request.");
         }
     }
 }
