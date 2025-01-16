@@ -7,7 +7,9 @@ import jules.pabst.application.monsterTradingCards.repository.CardRepository;
 import jules.pabst.application.monsterTradingCards.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class BattleService {
@@ -15,6 +17,7 @@ public class BattleService {
     private final CardRepository cardRepository;
     private final UserService userService;
     private final CardService cardService;
+    private String battleLog;
 
     public BattleService(UserRepository userRepository, CardRepository cardRepository, UserService userService, CardService cardService) {
         this.userRepository = userRepository;
@@ -87,7 +90,10 @@ public class BattleService {
         }
 
         battleLog.append(winner).append("\r\n");
-        return battleLog.toString();
+        battleLog.append(winner).append("\r\n");
+        battleLog.append(winner).append("\r\n");
+        this.battleLog = battleLog.toString();
+        return this.battleLog;
     }
 
     private boolean specialRules(Card card1, Card card2, StringBuilder log) {
@@ -143,5 +149,10 @@ public class BattleService {
 
         log.append(winner.getUsername()).append(" gains ").append(eloChange).append(" ELO points!\r\n");
         log.append(loser.getUsername()).append(" loses ").append(eloChange).append(" ELO points.\r\n");
+    }
+
+    public String getLastBattleLog(String player1, String player2) {
+        // Retrieve the battle log for either player
+        return battleLog;
     }
 }
